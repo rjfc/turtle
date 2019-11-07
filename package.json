@@ -8,7 +8,10 @@
   },
   "dependencies": {
     "body-parser": "^1.18.3",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "http": "0.0.0",
+    "serialport": "^8.0.5",
+    "socket.io": "^2.3.0"
   },
   "devDependencies": {
     "concurrently": "^4.0.1"

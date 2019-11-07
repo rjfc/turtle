@@ -1,20 +1,44 @@
 import React, { Component }  from 'react';
-import logo from './logo.svg';
 import './App.css';
 import Home from './Home.js';
+import SocketIO from 'socket.io-client'
+
+
+const connectionConfig = {
+    jsonp: false,
+    reconnection: true,
+    reconnectionDelay: 100,
+    reconnectionAttempts: 100000,
+    transports: ['websocket'], // you need to explicitly tell it to use websockets
+};
 
 class App extends Component {
+    constructor() {
+        super();
+        this.socket = SocketIO('http://localhost:5000', connectionConfig);
+        this.socket.on('connect', () => {
+            console.log('connected to server');
+        });
+    }
     state = {
         response: '',
         post: '',
         responseToPost: '',
+        endpoint: "localhost:5000"
     };
 
+    componentDidMount() {
+        const {endpoint} = this.state;
+        //Very simply connect to the socket
+        const socket = SocketIO(endpoint);
+        //Listen for data on the "outgoing data" namespace and supply a callback for what to do when we get one. In this case, we set a state variable
+        socket.on("port connected", data => this.setState({response: data.boolean}));
+    }/*
     componentDidMount() {
         this.callApi()
             .then(res => this.setState({ response: res.express }))
             .catch(err => console.log(err));
-    }
+    }*/
 
     callApi = async () => {
         const response = await fetch('/api/hello');
@@ -39,9 +63,10 @@ class App extends Component {
     };
 
     render() {
+        const {portStatus} = this.state;
         return (
             <div className="App">
-                <Home />
+                <Home portStatus = {portStatus}/>>
                 {/*<header className="App-header">
                 </header>
                 <p>{this.state.response}</p>

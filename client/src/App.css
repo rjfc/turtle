@@ -1,4 +1,4 @@
-  .App {
+.App {
   text-align: center;
 }
 
@@ -24,7 +24,27 @@
 }
 
 .Home-header {
+  width: 500px;
+  overflow: hidden;
+}
+
+.Home-header-text {
   font-family: 'Lobster', cursive;
   font-size: 12vmin;
   color: #0da440;
+  float:left;
+}
+
+.Home-header-logo {
+  float:left;
+  width: 230px;
+}
+
+.Home-printer-status {
+  float: left;
+  position: relative;
+  left: 20px;
+  top: 0px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
 }
