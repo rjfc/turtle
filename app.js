@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const socketIO = require("socket.io");
 var serialport = require("serialport");
 var SerialPort = serialport.SerialPort;
-var portName = "/dev/cu.usbmodem14201";
+var portName = "/dev/cu.usbmodem14101";
 
 var myPort = new serialport(portName,{
   baudRate:250000,
@@ -47,7 +47,7 @@ var receivedData = "";
 
 function onOpen() {
   console.log("Open connection");
-  socket.emit('port connected', true);
+ // socket.emit('port connected', true);
   setTimeout(function() {
     myPort.write(Buffer.from("M105\n"),function(err,result){
       if(err){
