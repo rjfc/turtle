@@ -11,7 +11,7 @@ const PortStatusDisplay = props => {
 const HomeHeader = () => {
     return (
         <div className="Home-header">
-            <img className="Home-header-logo" src={Logo} />
+            <img className="Home-header-logo" src={Logo} alt="Turtle logou"/>
             <h1 className="Home-header-text">Turtle</h1>
         </div>
     )
