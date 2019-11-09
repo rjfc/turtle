@@ -2,11 +2,11 @@ import React, { Component } from 'react'
 import Logo from './logo.png'
 
 const PortStatusDisplay = props => {
-    const status = props.portStatus
+    const status = props.portStatus;
     return (
         <h2 className="Home-printer-status">PRINTER STATUS: {status}</h2>
     )
-}
+};
 
 const HomeHeader = () => {
     return (
@@ -17,15 +17,26 @@ const HomeHeader = () => {
     )
 };
 
+const HomeButton = props => {
+    const text = props.buttonText;
+    return (
+        <div className="Home-button">{text}</div>
+    )
+};
+
 class Home extends Component {
     render() {
-        const { portStatus } = this.props
-
+        const { portStatus } = this.props;
+        const { button1Text } = this.props;
+        const { button2Text } = this.props;
         return (
-            <home>
-                <PortStatusDisplay portStatus = { portStatus }/>
+            <div>
                 <HomeHeader />
-            </home>
+                <HomeButton buttonText = { button1Text }/>
+                <HomeButton buttonText = { button2Text }/>
+                <PortStatusDisplay portStatus = { portStatus }/>
+
+            </div>
         )
     }
 }

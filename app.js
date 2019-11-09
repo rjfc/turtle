@@ -3,7 +3,9 @@ const app = express();
 const http = require("http");
 const bodyParser = require('body-parser');
 const socketIO = require("socket.io");
-var serialport = require("serialport");
+const serialport = require("serialport");
+const axios = require("axios");
+
 var SerialPort = serialport.SerialPort;
 var portName = "/dev/cu.usbmodem14101";
 
@@ -12,54 +14,54 @@ var myPort = new serialport(portName,{
   parser:new serialport.parsers.Readline("\n")
 });
 
-const server = http.createServer(app)
+const server = http.createServer(app);
 
-const io = socketIO(server)
+const io = socketIO(server);
 
 const port = process.env.PORT || 5000;
+var portStatus = "";
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get('/api/hello', (req, res) => {
-  res.send({ express: 'Hello From Express' });
+app.get('/port/status', (req, res) => {
+  res.send({ express: portStatus });
 });
 
+/*
 app.post('/api/world', (req, res) => {
   console.log(req.body);
   res.send(
     `I received your POST request. This is what you sent me: ${req.body.post}`,
   );
-});
+});*/
 
-io.on('connection', socket => {
-  console.log('User connected')
-
-  socket.on('disconnect', () => {
-    console.log('user disconnected')
-  })
-})
-
-
-myPort.on("open",onOpen);
+myPort.on("open", onOpen);
 myPort.on("data", onData);
-var receivedData = "";
+myPort.on('close', onClose);
 
 function onOpen() {
-  console.log("Open connection");
- // socket.emit('port connected', true);
-  setTimeout(function() {
-    myPort.write(Buffer.from("M105\n"),function(err,result){
-      if(err){
-        console.log('ERR: ' + err);
-      }
-      console.log('result:' + result)
-    });
-  }, 3000);
+  console.log("Opened serial port");
+  portStatus = "Online";
+  /* setTimeout(function() {
+     myPort.write(Buffer.from("M105\n"),function(err,result){
+       if(err){
+         console.log('ERR: ' + err);
+       }
+       console.log('result:' + result)
+     });
+   }, 1000);*/
 }
+
+function onClose(error) {
+  portStatus = "Offline";
+  console.log("Closed serial port");
+}
+
 function onData(data) {
   console.log("Data: " + data);
 }
+
 
 
 server.listen(port, () => console.log(`Listening on port ${port}`));
