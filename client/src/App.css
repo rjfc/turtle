@@ -26,6 +26,8 @@
 .Home-header {
   width: 500px;
   overflow: hidden;
+  top: 13vh;
+  position: relative;
   margin: auto;
 }
 
@@ -36,12 +38,30 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   float:left;
-
 }
 
 .Home-header-logo {
   float:left;
   width: 230px;
+}
+
+.Home-button {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  color: #F8F8F8;
+  background-color: #0eba48;
+  display:inline-block;
+  margin: 0 0 25px 0;
+  padding: 20px;
+  box-shadow: 0px 7px #0ca540;
+  border-radius: 3px;
+  position: relative;
+  top: 10vh;
+}
+
+.Home-button:hover:focus:active{
+  cursor: pointer;
+  background-color: #0b8a35;
 }
 
 .Home-printer-status {
@@ -51,4 +71,14 @@
   left: 30px;
   font-family: 'Montserrat', sans-serif;
   font-weight: 700;
+}
+
+.Home-container {
+  background-color: #a3f0b8;
+  background-color: rgba(163, 240, 184, 0.87);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }

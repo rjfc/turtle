@@ -48,7 +48,7 @@ class App extends Component {
         return (
             <div className="App">
                 <Home button1Text = {"PRINTER STATISTICS"}
-                      button2Text = {"SEARCH MODELS"}
+                      button2Text = {"SEARCH 3D MODELS"}
                       portStatus = {this.state.response}/>
 
 

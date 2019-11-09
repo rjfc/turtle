@@ -30,9 +30,10 @@ class Home extends Component {
         const { button1Text } = this.props;
         const { button2Text } = this.props;
         return (
-            <div>
+            <div className="Home-container">
                 <HomeHeader />
                 <HomeButton buttonText = { button1Text }/>
+                <br/>
                 <HomeButton buttonText = { button2Text }/>
                 <PortStatusDisplay portStatus = { portStatus }/>
 
