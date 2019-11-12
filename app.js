@@ -20,7 +20,8 @@ const io = socketIO(server);
 
 const port = process.env.PORT || 5000;
 var portStatus = "";
-var timeElapsed = "2ss";
+var timeElapsed = "";
+var hotendTemperature = "";
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -34,13 +35,22 @@ app.get('/stats/timeElapsed', (req, res) => {
     if(err){
       console.log('ERR: ' + err);
     }
-    console.log('result:' + result)
+   // console.log('result:' + result)
   });
   // TODO: GET TIME ELAPSED AND SEND
-  timeElapsed = "00:00:00";
   res.send({ express: timeElapsed });
 });
 
+app.get('/stats/hotendTemperature', (req, res) => {
+  myPort.write(Buffer.from("M105\n"),function(err,result){
+    if(err){
+      console.log('ERR: ' + err);
+    }
+    //console.log('result:' + result)
+
+  });
+  res.send({ express: hotendTemperature });
+});
 
 /*
 app.post('/api/world', (req, res) => {
@@ -73,7 +83,11 @@ function onClose(error) {
 }
 
 function onData(data) {
-  console.log("Data: " + data);
+  console.log(data + "\n");
+  var dataString = data.toString();
+  timeElapsed = dataString.substring(dataString.indexOf("time: "), dataString.indexOf("time: ") + 10);
+  hotendTemperature = dataString.substring(dataString.indexOf("T:") + 2, dataString.indexOf(" /0"));
+
 }
 
 

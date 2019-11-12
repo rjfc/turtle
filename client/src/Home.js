@@ -26,12 +26,16 @@ class Home extends Component {
         const { button2Text } = this.props;
         const { Label1Name } = this.props;
         const { Label1Value } = this.props;
+        const { Label2Name } = this.props;
+        const { Label2Value } = this.props;
         if (this.state.printerStatsActive) {
             return (
                 <div className="Printer-status-container">
                     <LogoHeader headerClass = {"Printer-stats-header"} />
                     <PrinterStats Label1Name = { Label1Name }
-                                  Label1Value = { Label1Value }/>
+                                  Label1Value = { Label1Value }
+                                  Label2Name = { Label2Name }
+                                  Label2Value = { Label2Value }/>
                     <PortStatus portStatus = { portStatus }/>
                 </div>
             )

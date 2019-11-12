@@ -7,6 +7,7 @@ class App extends Component {
     state = {
         portStatusResponse: '',
         timeElapsedResponse: '',
+        hotendTemperatureResponse: '',
     };
 
     componentDidMount() {
@@ -18,6 +19,9 @@ class App extends Component {
                 //TODO: only get time elapsed if user is on the printer stats page
                 this.getTimeElapsed()
                     .then(res => this.setState({ timeElapsedResponse: res.express }))
+                    .catch(err => console.log(err));
+                this.getHotendTemperature()
+                    .then(res => this.setState({ hotendTemperatureResponse: res.express }))
                     .catch(err => console.log(err));
             }, 1000);
         } catch(e) {
@@ -36,6 +40,14 @@ class App extends Component {
 
     getTimeElapsed = async () => {
         const response = await fetch('/stats/timeElapsed');
+        const body = await response.json();
+        if (response.status !== 200) throw Error(body.message);
+
+        return body;
+    };
+
+    getHotendTemperature = async () => {
+        const response = await fetch('/stats/hotendTemperature');
         const body = await response.json();
         if (response.status !== 200) throw Error(body.message);
 
@@ -63,7 +75,9 @@ class App extends Component {
                       button2Text = {"SEARCH 3D MODELS"}
                       portStatus = {this.state.portStatusResponse}
                       Label1Name = {"Time Elapsed"}
-                      Label1Value = {this.state.timeElapsedResponse}>
+                      Label1Value = {this.state.timeElapsedResponse}
+                      Label2Name = {"Hotend Temperature"}
+                      Label2Value = {this.state.hotendTemperatureResponse + "°"}>
                     <PrinterStats />
                 </Home>
                 {  /*<form onSubmit={this.handleSubmit}>
