@@ -5,16 +5,19 @@ import PrinterStats from './PrinterStats.js';
 
 class App extends Component {
     state = {
-        response: '',
-        post: '',
-        responseToPost: '',
+        portStatusResponse: '',
+        timeElapsedResponse: '',
     };
 
     componentDidMount() {
         try {
             setInterval(async () => {
-                this.callApi()
-                    .then(res => this.setState({ response: res.express }))
+                this.getPortStatus()
+                    .then(res => this.setState({ portStatusResponse: res.express }))
+                    .catch(err => console.log(err));
+                //TODO: only get time elapsed if user is on the printer stats page
+                this.getTimeElapsed()
+                    .then(res => this.setState({ timeElapsedResponse: res.express }))
                     .catch(err => console.log(err));
             }, 1000);
         } catch(e) {
@@ -23,7 +26,7 @@ class App extends Component {
 
     }
 
-    callApi = async () => {
+    getPortStatus = async () => {
         const response = await fetch('/port/status');
         const body = await response.json();
         if (response.status !== 200) throw Error(body.message);
@@ -31,7 +34,15 @@ class App extends Component {
         return body;
     };
 
-    handleSubmit = async e => {
+    getTimeElapsed = async () => {
+        const response = await fetch('/stats/timeElapsed');
+        const body = await response.json();
+        if (response.status !== 200) throw Error(body.message);
+
+        return body;
+    };
+
+    /*handleSubmit = async e => {
         e.preventDefault();
         const response = await fetch('/api/world', {
             method: 'POST',
@@ -43,14 +54,16 @@ class App extends Component {
         const body = await response.text();
 
         this.setState({ responseToPost: body });
-    };
+    };*/
 
     render() {
         return (
             <div className="App">
                 <Home button1Text = {"PRINTER STATISTICS"}
                       button2Text = {"SEARCH 3D MODELS"}
-                      portStatus = {this.state.response}>
+                      portStatus = {this.state.portStatusResponse}
+                      Label1Name = {"Time Elapsed"}
+                      Label1Value = {this.state.timeElapsedResponse}>
                     <PrinterStats />
                 </Home>
                 {  /*<form onSubmit={this.handleSubmit}>

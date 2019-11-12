@@ -20,6 +20,7 @@ const io = socketIO(server);
 
 const port = process.env.PORT || 5000;
 var portStatus = "";
+var timeElapsed = "2ss";
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -27,6 +28,19 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.get('/port/status', (req, res) => {
   res.send({ express: portStatus });
 });
+
+app.get('/stats/timeElapsed', (req, res) => {
+  myPort.write(Buffer.from("M31\n"),function(err,result){
+    if(err){
+      console.log('ERR: ' + err);
+    }
+    console.log('result:' + result)
+  });
+  // TODO: GET TIME ELAPSED AND SEND
+  timeElapsed = "00:00:00";
+  res.send({ express: timeElapsed });
+});
+
 
 /*
 app.post('/api/world', (req, res) => {
