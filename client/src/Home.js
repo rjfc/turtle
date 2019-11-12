@@ -1,42 +1,45 @@
 import React, { Component } from 'react'
-import Logo from './logo.png'
+import LogoHeader from "./LogoHeader";
+import LargeButton from "./LargeButton";
+import PortStatus from "./PortStatus";
+import PrinterStats from "./PrinterStats";
 
-const PortStatusDisplay = props => {
-    const status = props.portStatus;
-    return (
-        <h2 className="Home-printer-status">PRINTER STATUS: {status}</h2>
-    )
-};
-
-const HomeHeader = () => {
-    return (
-        <div className="Home-header">
-            <img className="Home-header-logo" src={Logo} alt="Turtle logou"/>
-            <h1 className="Home-header-text">Turtle</h1>
-        </div>
-    )
-};
-
-const HomeButton = props => {
-    const text = props.buttonText;
-    return (
-        <div className="Home-button">{text}</div>
-    )
-};
 
 class Home extends Component {
+    constructor(props){
+        super(props);
+
+        this.state = {
+            printerStatsActive: false,
+        };
+
+        this.LoadPrinterStats = this.LoadPrinterStats.bind(this);
+    }
+
+    LoadPrinterStats() {
+        this.setState({ printerStatsActive: true });
+    }
+
     render() {
         const { portStatus } = this.props;
         const { button1Text } = this.props;
         const { button2Text } = this.props;
+        if (this.state.printerStatsActive) {
+            return (
+                <div className="Printer-status-container">
+                    <LogoHeader headerClass = {"Printer-stats-header"} />
+                    <PrinterStats />
+                    <PortStatus portStatus = { portStatus }/>
+                </div>
+            )
+    }
         return (
             <div className="Home-container">
-                <HomeHeader />
-                <HomeButton buttonText = { button1Text }/>
+                <LogoHeader headerClass = {"Home-header"} />
+                <LargeButton buttonText = { button1Text } clickEvent = { this.LoadPrinterStats }/>
                 <br/>
-                <HomeButton buttonText = { button2Text }/>
-                <PortStatusDisplay portStatus = { portStatus }/>
-
+                <LargeButton buttonText = { button2Text }/>
+                <PortStatus portStatus = { portStatus }/>
             </div>
         )
     }

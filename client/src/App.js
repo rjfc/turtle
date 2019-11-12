@@ -1,6 +1,7 @@
 import React, { Component }  from 'react';
 import './App.css';
 import Home from './Home.js';
+import PrinterStats from './PrinterStats.js';
 
 class App extends Component {
     state = {
@@ -49,9 +50,9 @@ class App extends Component {
             <div className="App">
                 <Home button1Text = {"PRINTER STATISTICS"}
                       button2Text = {"SEARCH 3D MODELS"}
-                      portStatus = {this.state.response}/>
-
-
+                      portStatus = {this.state.response}>
+                    <PrinterStats />
+                </Home>
                 {  /*<form onSubmit={this.handleSubmit}>
 
                     <input
