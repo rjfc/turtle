@@ -95,7 +95,8 @@ class App extends Component {
                       Label4Name = {"Y Position"}
                       Label4Value = {this.state.currentPositionResponse.Y}
                       Label5Name = {"Z Position"}
-                      Label5Value = {this.state.currentPositionResponse.Z}>
+                      Label5Value = {this.state.currentPositionResponse.Z}
+                      placeholderText = {"Search 3D models"}>
                     <PrinterStats />
                 </Home>
                 {  /*<form onSubmit={this.handleSubmit}>

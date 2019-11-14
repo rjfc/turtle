@@ -14,7 +14,7 @@ class PrinterStats extends Component {
         const { Label5Name } = this.props;
         const { Label5Value } = this.props;
         return (
-            <div className="Printer-stats-container">
+            <div>
                 <PrinterStatsLabel LabelName={Label1Name} LabelValue={Label1Value}/>
                 <PrinterStatsLabel LabelName={Label2Name} LabelValue={Label2Value}/>
                 <PrinterStatsLabel LabelName={Label3Name} LabelValue={Label3Value}/>

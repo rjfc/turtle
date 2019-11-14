@@ -58,7 +58,7 @@
 .Home-button {
   font-family: 'Montserrat', sans-serif;
   font-weight: 700;
-  color: #F8F8F8;
+  color: #f8f8f8;
   background-color: #0eba48;
   display:inline-block;
   margin: 0 0 25px 0;
@@ -67,7 +67,7 @@
   border-radius: 3px;
   position: relative;
   top: 10vh;
-  font-size: 2.8vh;
+  font-size: 2.6vh;
   cursor: pointer;
 }
 
@@ -90,7 +90,7 @@
   height: 100%;
 }
 
-.Printer-status-container {
+.Printer-stats-container {
   background-color: #a3f0b8;
   background-color: rgba(163, 240, 184, 0.87);
   position: absolute;
@@ -126,4 +126,36 @@
   left: 3vw;
   float: left;
   cursor: pointer;
+}
+
+.Search-models-container {
+  background-color: #a3f0b8;
+  background-color: rgba(163, 240, 184, 0.87);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.Load-models-header {
+  width: 500px;
+  overflow: hidden;
+  position: relative;
+  margin: auto;
+  top: 22px;
+  float: start;
+  clear: left;
+}
+
+.Large-search {
+  font-family: 'Montserrat', sans-serif;
+  width: 50%;
+  height: auto;
+  font-size: 4vh;
+  padding: 20px;
+  color: WHite;
+  background-color: #09d3ac;
+  box-shadow: 6px 6px #07ad8d;
+  border: none;
 }

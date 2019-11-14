@@ -4,6 +4,7 @@ import LargeButton from "./LargeButton";
 import PortStatus from "./PortStatus";
 import PrinterStats from "./PrinterStats";
 import BackButton from "./BackButton";
+import SearchModels from "./SearchModels";
 
 class Home extends Component {
     constructor(props){
@@ -11,24 +12,36 @@ class Home extends Component {
 
         this.state = {
             homeActive: true,
-            printerStatsActive: false
+            printerStatsActive: false,
+            searchModelsActive : false
         };
 
         this.LoadHome = this.LoadHome.bind(this);
         this.LoadPrinterStats = this.LoadPrinterStats.bind(this);
+        this.LoadSearchModels = this.LoadSearchModels.bind(this);
     }
 
     LoadHome() {
         this.setState({
             homeActive: true,
-            printerStatsActive: false
+            printerStatsActive: false,
+            searchModelsActive: false
         });
     }
 
     LoadPrinterStats() {
         this.setState({
             homeActive: false,
-            printerStatsActive: true
+            printerStatsActive: true,
+            searchModelsActive: false
+        });
+    }
+
+    LoadSearchModels() {
+        this.setState({
+            homeActive: false,
+            printerStatsActive: false,
+            searchModelsActive: true
         });
     }
 
@@ -46,9 +59,24 @@ class Home extends Component {
         const { Label4Value } = this.props;
         const { Label5Name } = this.props;
         const { Label5Value } = this.props;
-        if (this.state.printerStatsActive && !this.state.homeActive) {
+        const { placeholderText } = this.props;
+
+        if (this.state.homeActive && !this.state.printerStatsActive && !this.state.searchModelsActive) {
             return (
-                <div className="Printer-status-container">
+                <div className="Home-container">
+                    <LogoHeader headerClass = {"Home-header"} />
+                    <LargeButton buttonText = { button1Text }
+                                 clickEvent = { this.LoadPrinterStats }/>
+                    <br/>
+                    <LargeButton buttonText = { button2Text }
+                                 clickEvent = { this.LoadSearchModels }/>
+                    <PortStatus portStatus = { portStatus }/>
+                </div>
+            )
+        }
+        else if (this.state.printerStatsActive && !this.state.homeActive && !this.state.searchModelsActive) {
+            return (
+                <div className="Printer-stats-container">
                     <BackButton clickEvent = { this.LoadHome } />
                     <LogoHeader headerClass = {"Printer-stats-header"} />
                     <PrinterStats Label1Name = { Label1Name }
@@ -65,15 +93,12 @@ class Home extends Component {
                 </div>
             )
         }
-        else if (this.state.homeActive && !this.state.printerStatsActive) {
+        else if (this.state.searchModelsActive && !this.state.homeActive && !this.state.printerStatsActive) {
             return (
-                <div className="Home-container">
-                    <LogoHeader headerClass = {"Home-header"} />
-                    <LargeButton buttonText = { button1Text }
-                                 clickEvent = { this.LoadPrinterStats }/>
-                    <br/>
-                    <LargeButton buttonText = { button2Text }/>
-                    <PortStatus portStatus = { portStatus }/>
+                <div className="Search-models-container">
+                    <BackButton clickEvent = { this.LoadHome } />
+                    <LogoHeader headerClass = {"Load-models-header"} />
+                    <SearchModels placeholderText = { placeholderText }/>
                 </div>
             )
         }
