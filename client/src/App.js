@@ -8,6 +8,7 @@ class App extends Component {
         portStatusResponse: '',
         timeElapsedResponse: '',
         hotendTemperatureResponse: '',
+        currentPositionResponse: ''
     };
 
     componentDidMount() {
@@ -22,6 +23,9 @@ class App extends Component {
                     .catch(err => console.log(err));
                 this.getHotendTemperature()
                     .then(res => this.setState({ hotendTemperatureResponse: res.express }))
+                    .catch(err => console.log(err));
+                this.getCurrentPosition()
+                    .then(res => this.setState({ currentPositionResponse: res.express }))
                     .catch(err => console.log(err));
             }, 1000);
         } catch(e) {
@@ -54,6 +58,14 @@ class App extends Component {
         return body;
     };
 
+    getCurrentPosition = async () => {
+        const response = await fetch('/stats/currentPosition');
+        const body = await response.json();
+        if (response.status !== 200) throw Error(body.message);
+
+        return body;
+    };
+
     /*handleSubmit = async e => {
         e.preventDefault();
         const response = await fetch('/api/world', {
@@ -77,7 +89,13 @@ class App extends Component {
                       Label1Name = {"Time Elapsed"}
                       Label1Value = {this.state.timeElapsedResponse}
                       Label2Name = {"Hotend Temperature"}
-                      Label2Value = {this.state.hotendTemperatureResponse + "°"}>
+                      Label2Value = {this.state.hotendTemperatureResponse + "°"}
+                      Label3Name = {"X Position"}
+                      Label3Value = {this.state.currentPositionResponse.X}
+                      Label4Name = {"Y Position"}
+                      Label4Value = {this.state.currentPositionResponse.Y}
+                      Label5Name = {"Z Position"}
+                      Label5Value = {this.state.currentPositionResponse.Z}>
                     <PrinterStats />
                 </Home>
                 {  /*<form onSubmit={this.handleSubmit}>

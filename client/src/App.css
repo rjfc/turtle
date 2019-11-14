@@ -36,7 +36,9 @@
   overflow: hidden;
   position: relative;
   margin: auto;
-  bottom: 15px;
+  bottom: 45px;
+  float:start;
+  clear: left;
 }
 
 .Header-text {
@@ -65,6 +67,7 @@
   border-radius: 3px;
   position: relative;
   top: 10vh;
+  font-size: 2.8vh;
   cursor: pointer;
 }
 
@@ -104,6 +107,23 @@
   font-size: 4.5vh;
   position: relative;
   float: left;
+  clear: left;
   left: 7vw;
   bottom: 20px;
+}
+
+.Back-button {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  color: #F8F8F8;
+  font-size: 2.6vh;
+  background-color: #0eba48;
+  display:inline-block;
+  padding: 15px 30px 15px 30px;
+  border-radius: 3px;
+  position: relative;
+  top: 3vw;
+  left: 3vw;
+  float: left;
+  cursor: pointer;
 }

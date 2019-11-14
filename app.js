@@ -24,6 +24,11 @@ const port = process.env.PORT || 5000;
 var portStatus = "";
 var timeElapsed = "";
 var hotendTemperature = "";
+var currentPosition = {
+  X: "",
+  Y: "",
+  Z: ""
+};
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -37,9 +42,7 @@ app.get('/stats/timeElapsed', (req, res) => {
     if(err){
       console.log('ERR: ' + err);
     }
-   // console.log('result:' + result)
   });
-  // TODO: GET TIME ELAPSED AND SEND
   res.send({ express: timeElapsed });
 });
 
@@ -48,10 +51,17 @@ app.get('/stats/hotendTemperature', (req, res) => {
     if(err){
       console.log('ERR: ' + err);
     }
-    //console.log('result:' + result)
-
   });
   res.send({ express: hotendTemperature });
+});
+
+app.get('/stats/currentPosition', (req, res) => {
+  myPort.write(Buffer.from("M114\n"),function(err,result){
+    if(err){
+      console.log('ERR: ' + err);
+    }
+  });
+  res.send({ express: currentPosition });
 });
 
 /*
@@ -89,9 +99,17 @@ function onData(data) {
   dataString = dataString.replace(/\s/g, "");
   console.log("start data:" + dataString + "close\n");
 
-  timeElapsed = dataString.substring(dataString.indexOf("Printtime:"), dataString.indexOf("sok"));
-  hotendTemperature = dataString.substring(dataString.indexOf("okokT:"), dataString.indexOf("/0.00"));
-
+  if (dataString.indexOf("Printtime:") >= 0) { //Print time
+    timeElapsed = dataString.substring(dataString.indexOf("Printtime:") + 10, dataString.length);
+  }
+  else if (dataString.indexOf("okT:") >= 0) { //Hotend temperature
+    hotendTemperature = dataString.substring(dataString.indexOf("okT:") + 4, dataString.indexOf("/0.00"));
+  }
+  else if (dataString.indexOf("CountX:") >= 0) { //X,Y,Z position
+    currentPosition.X = dataString.substring(dataString.indexOf("X:") + 2, dataString.indexOf("Y:"));
+    currentPosition.Y = dataString.substring(dataString.indexOf("Y:") + 2, dataString.indexOf("Z:"));
+    currentPosition.Z = dataString.substring(dataString.indexOf("Z:") + 2, dataString.indexOf("E:"));
+  }
 }
 
 
