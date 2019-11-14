@@ -28,6 +28,16 @@ code {
 ::-ms-input-placeholder { /* Microsoft Edge */
   color: #078f74;
 }
+
 input:focus {
   outline:0;
+}
+
+input, input:before, input:after {
+  -webkit-user-select: initial;
+  -khtml-user-select: initial;
+  -moz-user-select: initial;
+  -ms-user-select: initial;
+  -webkit-appearance: none;
+  user-select: initial;
 }
