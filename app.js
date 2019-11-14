@@ -4,15 +4,17 @@ const http = require("http");
 const bodyParser = require('body-parser');
 const socketIO = require("socket.io");
 const serialport = require("serialport");
-const axios = require("axios");
+const Readline = require("parser-readline");
 
 var SerialPort = serialport.SerialPort;
 var portName = "/dev/cu.usbmodem14101";
 
 var myPort = new serialport(portName,{
   baudRate:250000,
-  parser:new serialport.parsers.Readline("\n")
+  parser:new serialport.parsers.Readline("\r\n")
 });
+
+const parser =  myPort.pipe(new Readline({ delimiter: "\n"}));
 
 const server = http.createServer(app);
 
@@ -61,7 +63,7 @@ app.post('/api/world', (req, res) => {
 });*/
 
 myPort.on("open", onOpen);
-myPort.on("data", onData);
+parser.on("data", onData);
 myPort.on('close', onClose);
 
 function onOpen() {
@@ -83,10 +85,12 @@ function onClose(error) {
 }
 
 function onData(data) {
-  console.log(data + "\n");
   var dataString = data.toString();
-  timeElapsed = dataString.substring(dataString.indexOf("time: "), dataString.indexOf("time: ") + 10);
-  hotendTemperature = dataString.substring(dataString.indexOf("T:") + 2, dataString.indexOf(" /0"));
+  dataString = dataString.replace(/\s/g, "");
+  console.log("start data:" + dataString + "close\n");
+
+  timeElapsed = dataString.substring(dataString.indexOf("Printtime:"), dataString.indexOf("sok"));
+  hotendTemperature = dataString.substring(dataString.indexOf("okokT:"), dataString.indexOf("/0.00"));
 
 }
 
