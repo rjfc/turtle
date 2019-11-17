@@ -13,7 +13,8 @@ class Home extends Component {
         this.state = {
             homeActive: true,
             printerStatsActive: false,
-            searchModelsActive : false
+            searchModelsActive : false,
+            description: ''
         };
 
         this.LoadHome = this.LoadHome.bind(this);
@@ -44,7 +45,21 @@ class Home extends Component {
             searchModelsActive: true
         });
     }
+/*
+    searchModels = async e => {
+        e.preventDefault();
+        const response = await fetch('/models/search', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ post: this.state.post }),
+        });
+        const body = await response.text();
 
+        this.setState({ responseToPost: body });
+    };
+*/
     render() {
         const { portStatus } = this.props;
         const { button1Text } = this.props;
@@ -98,7 +113,7 @@ class Home extends Component {
                 <div className="Search-models-container">
                     <BackButton clickEvent = { this.LoadHome } />
                     <LogoHeader headerClass = {"Load-models-header"} />
-                    <SearchModels placeholderText = { placeholderText }/>
+                    <SearchModels placeholderText = { placeholderText } formAction = {"/models/search"} />
                 </div>
             )
         }

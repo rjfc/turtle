@@ -1,13 +1,15 @@
-const express = require('express');
-const app = express();
-const http = require("http");
-const bodyParser = require('body-parser');
-const socketIO = require("socket.io");
-const serialport = require("serialport");
-const Readline = require("parser-readline");
+const express = require('express'),
+      app = express(),
+      http = require("http"),
+      bodyParser = require('body-parser'),
+      socketIO = require("socket.io"),
+      serialport = require("serialport"),
+      Readline = require("parser-readline"),
+      rp = require("request-promise"),
+      $ = require('cheerio');
 
-var SerialPort = serialport.SerialPort;
-var portName = "/dev/cu.usbmodem14101";
+var portName = "/dev/cu.usbmodem14201";
+var modelDatabaseURL = "https://free3d.com/3d-models/";
 
 var myPort = new serialport(portName,{
   baudRate:250000,
@@ -17,7 +19,6 @@ var myPort = new serialport(portName,{
 const parser =  myPort.pipe(new Readline({ delimiter: "\n"}));
 
 const server = http.createServer(app);
-
 const io = socketIO(server);
 
 const port = process.env.PORT || 5000;
@@ -62,6 +63,34 @@ app.get('/stats/currentPosition', (req, res) => {
     }
   });
   res.send({ express: currentPosition });
+});
+
+app.post('/models/search', (req, res) => {
+  //${req.body.post} is the search data.
+ /* rp(modelDatabaseURL)
+      .then(function(html){
+        //success!
+        console.log(html);
+      })
+      .catch(function(err){
+        //handle error
+      });*/
+ //console.log(req.body.searchValue);
+  console.log(req.body.searchValue);
+  /*rp(modelDatabaseURL + req.body.searchValue)
+      .then(function(html){
+        const modelLinks = [];
+        const modelThumbnails = [];
+        console.log($('.search-result__content-wrapper > .search-result__thumb-wrapper', html).length);
+        for (let i = 0; i < $('.search-result__content-wrapper > .search-result__thumb-wrapper', html).length; i++) {
+          modelLinks.push($('.search-result__content-wrapper > .search-result__thumb-wrapper', html)[i].attribs.href);
+          modelThumbnails.push($('.search-result__content-wrapper > .search-result__thumb-wrapper > img', html)[i].attribs.src);
+        }
+        res.send ({ express: modelThumbnails });
+      })
+      .catch(function(err){
+        //handle error
+      });*/
 });
 
 /*
@@ -112,6 +141,30 @@ function onData(data) {
   }
 }
 
+io.on("connection", socket => {
+  console.log("New client connected");
+  //Here we listen on a new namespace called "incoming data"
+  socket.on("search models", (data)=>{
+    //Here we broadcast it out to all other sockets EXCLUDING the socket which sent us the data
+    console.log(data);
+    rp(modelDatabaseURL + data)
+        .then(function(html){
+          const modelLinks = [];
+          const modelThumbnails = [];
+          console.log($('.search-result__content-wrapper > .search-result__thumb-wrapper', html).length);
+          for (let i = 0; i < $('.search-result__content-wrapper > .search-result__thumb-wrapper', html).length; i++) {
+            modelLinks.push($('.search-result__content-wrapper > .search-result__thumb-wrapper', html)[i].attribs.href);
+            modelThumbnails.push($('.search-result__content-wrapper > .search-result__thumb-wrapper > img', html)[i].attribs.src);
+          }
+          io.sockets.emit("search models thumbnails", modelThumbnails);
+        })
+        .catch(function(err){
+          //handle error
+        });
+  });
 
+  //A special namespace "disconnect" for when a client disconnects
+  socket.on("disconnect", () => console.log("Client disconnected"));
+});
 
 server.listen(port, () => console.log(`Listening on port ${port}`));

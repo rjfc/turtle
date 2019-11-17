@@ -1,7 +1,6 @@
 import React, { Component }  from 'react';
 import './App.css';
 import Home from './Home.js';
-import PrinterStats from './PrinterStats.js';
 
 class App extends Component {
     state = {
@@ -12,7 +11,7 @@ class App extends Component {
     };
 
     componentDidMount() {
-        try {
+        /*try {
             setInterval(async () => {
                 this.getPortStatus()
                     .then(res => this.setState({ portStatusResponse: res.express }))
@@ -30,7 +29,7 @@ class App extends Component {
             }, 1000);
         } catch(e) {
             console.log(e);
-        }
+        }*/
 
     }
 
@@ -66,19 +65,6 @@ class App extends Component {
         return body;
     };
 
-    /*handleSubmit = async e => {
-        e.preventDefault();
-        const response = await fetch('/api/world', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ post: this.state.post }),
-        });
-        const body = await response.text();
-
-        this.setState({ responseToPost: body });
-    };*/
 
     render() {
         return (
@@ -96,19 +82,11 @@ class App extends Component {
                       Label4Value = {this.state.currentPositionResponse.Y}
                       Label5Name = {"Z Position"}
                       Label5Value = {this.state.currentPositionResponse.Z}
-                      placeholderText = {"Search 3D models"}>
-                    <PrinterStats />
-                </Home>
-                {  /*<form onSubmit={this.handleSubmit}>
+                      placeholderText = {"Search 3D models"}
+                      formAction = {"/models/search"}>
 
-                    <input
-                        type="text"
-                        value={this.state.post}
-                        onChange={e => this.setState({ post: e.target.value })}
-                    />
-                    <button type="submit">Submit</button>
-                </form>
-                <p>{this.state.responseToPost}</p>*/}
+                </Home>
+
             </div>
         );
     }
