@@ -112,7 +112,6 @@ class Home extends Component {
             return (
                 <div className="Search-models-container">
                     <BackButton clickEvent = { this.LoadHome } />
-                    <LogoHeader headerClass = {"Load-models-header"} />
                     <SearchModels placeholderText = { placeholderText } formAction = {"/models/search"} />
                 </div>
             )

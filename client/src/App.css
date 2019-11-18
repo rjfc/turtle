@@ -189,3 +189,39 @@
   display: block;
   overflow: hidden;
 }
+
+.Load-models-loaded-header {
+  width: 500px;
+  overflow: hidden;
+  position: relative;
+  margin: auto;
+  bottom: 60px;
+  float: right;
+  left: 130px;
+  clear: left;
+}
+
+.Load-models-loaded-header > img {
+  width: 160px
+}
+
+.Load-models-loaded-header > h1 {
+  font-family: 'Lobster', cursive;
+  font-size: 9vmin;
+  background: -webkit-linear-gradient(#38ef7d, #11998e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  float: left;
+  position: relative;
+  bottom: 10px;
+}
+
+.Large-search-loaded-container {
+  position: relative;
+  top: 30px;
+  left: 90px;
+  margin: auto;
+  width: 55%;
+  overflow: hidden;
+  box-shadow: 0 3px 6px rgba(7, 62, 58, 0.16), 0 3px 6px rgba(0,0,0,0.23) !important;
+}
