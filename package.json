@@ -14,9 +14,12 @@
     "http": "0.0.0",
     "parser-readline": "^1.0.2",
     "puppeteer": "^2.0.0",
+    "react-responsive-carousel": "^3.1.51",
+    "react-slick": "^0.25.2",
     "request": "^2.88.0",
     "request-promise": "^4.2.5",
     "serialport": "^8.0.5",
+    "slick-carousel": "^1.8.1",
     "socket.io": "^2.3.0"
   },
   "devDependencies": {

@@ -111,7 +111,7 @@ class Home extends Component {
         else if (this.state.searchModelsActive && !this.state.homeActive && !this.state.printerStatsActive) {
             return (
                 <div className="Search-models-container">
-                    <BackButton clickEvent = { this.LoadHome } />
+
                     <SearchModels placeholderText = { placeholderText } formAction = {"/models/search"} />
                 </div>
             )

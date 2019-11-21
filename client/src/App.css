@@ -37,7 +37,7 @@
   position: relative;
   margin: auto;
   bottom: 45px;
-  float:start;
+  float: start;
   clear: left;
 }
 
@@ -60,7 +60,7 @@
   font-weight: 700;
   color: #f8f8f8;
   background-color: #0eba48;
-  display:inline-block;
+  display: inline-block;
   margin: 0 0 25px 0;
   padding: 20px;
   box-shadow: 0px 7px #0ca540;
@@ -118,7 +118,7 @@
   color: #F8F8F8;
   font-size: 2.6vh;
   background-color: #0eba48;
-  display:inline-block;
+  display: inline-block;
   padding: 15px 30px 15px 30px;
   border-radius: 3px;
   position: relative;
@@ -126,6 +126,7 @@
   left: 3vw;
   float: left;
   cursor: pointer;
+  z-index: 4;
 }
 
 .Search-models-container {
@@ -191,23 +192,32 @@
 }
 
 .Load-models-loaded-header {
-  width: 500px;
+  width: 42%;
   overflow: hidden;
   position: relative;
   margin: auto;
-  bottom: 60px;
+  bottom: 45px;
   float: right;
-  left: 130px;
+  left: 180px;
+  clear: left;
+}
+.Model-info-header {
+  width: 42%;
+  overflow: hidden;
+  position: absolute;
+  margin: auto;
+  float: right;
+  left: 75%;
   clear: left;
 }
 
-.Load-models-loaded-header > img {
-  width: 160px
+.Load-models-loaded-header > img, .Model-info-header > img{
+  width: 25%;
 }
 
-.Load-models-loaded-header > h1 {
+.Load-models-loaded-header > h1, .Model-info-header > h1 {
   font-family: 'Lobster', cursive;
-  font-size: 9vmin;
+  font-size: 6.8vmin;
   background: -webkit-linear-gradient(#38ef7d, #11998e);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -218,10 +228,104 @@
 
 .Large-search-loaded-container {
   position: relative;
-  top: 30px;
-  left: 90px;
+  bottom: 30px;
+  left: 180px;
   margin: auto;
   width: 55%;
   overflow: hidden;
   box-shadow: 0 3px 6px rgba(7, 62, 58, 0.16), 0 3px 6px rgba(0,0,0,0.23) !important;
+}
+
+.Load-models-loaded-thumbnail {
+  position: relative;
+  margin: auto;
+  height: 65vh;
+  width: auto !important;
+}
+
+.Load-models-loaded-carousel {
+  position: relative;
+  bottom: 5vh;
+  margin: auto;
+}
+
+.Load-models-loaded-indication-text {
+  color: #0b8a35;
+  font-weight: 500;
+  font-size: 3vh;
+}
+
+.Model-info-name {
+  margin: 0 auto;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: bold;
+  font-size: 4vh;
+  position: relative;
+  display: block;
+}
+
+.Model-info-thumbnail {
+  display: block;
+  position: relative;
+  top: 20px;
+  max-width: 65vw;
+  max-height: 60vh;
+  box-shadow: 4px 4px 8px #069b7e;
+}
+
+.Model-info-container {
+  width: 100%;
+  position: relative;
+  top: 100px;
+}
+
+.flexbox-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: auto;
+  margin: 0;
+  min-height: 24em;
+
+}
+
+.flexbox-item {
+  max-width: 50%;
+
+}
+.fixed {
+  flex: none;
+  max-width: 50%;
+}
+
+.View-other-models-button {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  color: #F8F8F8;
+  font-size: 2.6vh;
+  background-color: #0eba48;
+  display: inline-block;
+  padding: 15px 30px 15px 30px;
+  border-radius: 3px;
+  position: absolute;
+  top: 3vw;
+  left: 3vw;
+  float: left;
+  cursor: pointer;
+}
+
+.Print-model-button {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  color: #f8f8f8;
+  background-color: #0eba48;
+  display: inline-block;
+  margin: 0 0 25px 0;
+  padding: 20px;
+  box-shadow: 0px 7px #0ca540;
+  border-radius: 3px;
+  position: relative;
+  top: 20vh;
+  font-size: 2.6vh;
+  cursor: pointer;
 }

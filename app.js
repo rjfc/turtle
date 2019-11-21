@@ -31,6 +31,10 @@ var currentPosition = {
   Z: ""
 };
 
+var modelLinks = [];
+var modelNames = [];
+var modelThumbnails = [];
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -149,18 +153,40 @@ io.on("connection", socket => {
     console.log(data);
     rp(modelDatabaseURL + data)
         .then(function(html){
-          const modelLinks = [];
-          const modelThumbnails = [];
-          console.log($('.search-result__content-wrapper > .search-result__thumb-wrapper', html).length);
-          for (let i = 0; i < $('.search-result__content-wrapper > .search-result__thumb-wrapper', html).length; i++) {
-            modelLinks.push($('.search-result__content-wrapper > .search-result__thumb-wrapper', html)[i].attribs.href);
-            modelThumbnails.push($('.search-result__content-wrapper > .search-result__thumb-wrapper > img', html)[i].attribs.src);
+          modelLinks = [];
+          modelNames = [];
+          modelThumbnails = [];
+          console.log($('.page-results-container > .search-results > .search-result > .search-result__content-wrapper > .search-result__thumb-wrapper', html).length);
+          for (let i = 0; i < $('.page-results-container > .search-results > .search-result > .search-result__content-wrapper > .search-result__thumb-wrapper', html).length; i++) {
+            modelLinks.push("https://free3d.com" + $('.page-results-container > .search-results > .search-result > .search-result__content-wrapper > .search-result__thumb-wrapper', html)[i].attribs.href);
+            modelNames.push($('.page-results-container > .search-results > .search-result > .search-result__content-wrapper > .search-result__thumb-wrapper > img', html)[i].attribs.title);
+            modelNames[i] = modelNames[i].replace("3d model", "").trim();
+            modelThumbnails.push($('.page-results-container > .search-results > .search-result > .search-result__content-wrapper > .search-result__thumb-wrapper > img', html)[i].attribs.src);
+            modelThumbnails[i] = modelThumbnails[i].replace("imgd/s", "imgd/l");
           }
-          io.sockets.emit("search models thumbnails", modelThumbnails);
+          console.log(modelNames);
+          const modelsInfo = {
+            modelThumbnails: modelThumbnails
+          };
+          io.sockets.emit("search models thumbnails", modelsInfo);
         })
         .catch(function(err){
           //handle error
         });
+  });
+
+  socket.on("get model info", (idNumber) =>{
+    const modelInfo = {
+      name: modelNames[idNumber],
+      url: modelLinks[idNumber],
+      thumbnail: modelThumbnails[idNumber]
+    };
+    io.sockets.emit("model info", modelInfo);
+  });
+
+  socket.on("print model", (url) =>{
+    console.log("url:" + url);
+
   });
 
   //A special namespace "disconnect" for when a client disconnects
