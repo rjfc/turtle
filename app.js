@@ -6,10 +6,21 @@ const express = require('express'),
       serialport = require("serialport"),
       Readline = require("parser-readline"),
       rp = require("request-promise"),
-      $ = require('cheerio');
+      $ = require("cheerio"),
+      fs = require("fs"),
+      puppeteer = require("puppeteer"),
+      extract = require('extract-zip'),
+      path = require('path');
+
+const Nightmare = require('nightmare');
+require('nightmare-download-manager')(Nightmare);
+const nightmare = Nightmare({ show: true });
 
 var portName = "/dev/cu.usbmodem14201";
 var modelDatabaseURL = "https://free3d.com/3d-models/";
+var modelPrintURL = "https://static.free3d.com/models/123d/printable_catalog/";
+const modelDownloadFolder = "/Users/Russell/Downloads/";
+var zipName = '';
 
 var myPort = new serialport(portName,{
   baudRate:250000,
@@ -145,6 +156,55 @@ function onData(data) {
   }
 }
 
+nightmare.on('download', function(state, downloadItem){
+  if(state == 'started'){
+    nightmare.emit('download', modelDownloadFolder+ 'file.zip', downloadItem);
+  }
+});
+
+function getFilesizeInBytes(filename) {
+  var stats = fs.statSync(filename)
+  var fileSizeInBytes = stats["size"]
+  return fileSizeInBytes
+}
+
+function findModel(startPath, filter){
+
+  //console.log('Starting from dir '+startPath+'/');
+
+ if (!fs.existsSync(startPath)){
+    return '';
+  }
+
+  var files = fs.readdirSync(startPath);
+  for(var i = 0;i < files.length;i++){
+    var fileName = path.join(startPath,files[i]);
+    var stat = fs.lstatSync(fileName);
+    if (stat.isDirectory()){
+      findModel(fileName, filter);
+    }
+    else if (fileName.indexOf(filter) >= 0) {
+      // found
+      return fileName;
+    };
+  };
+};
+
+
+fs.watch(modelDownloadFolder, (eventType, filename) => {
+  if (filename.includes(zipName.replace(".zip","")) && getFilesizeInBytes(modelDownloadFolder+filename) > 0) {
+    console.log("filename:" + filename);
+    var dest = modelDownloadFolder + filename.replace(".zip", "");
+    extract(modelDownloadFolder + filename, {dir: dest}, function (err) {
+      // If .obj file found but .stl is not
+      if (findModel(modelDownloadFolder, ".obj") !== '' && findModel(modelDownloadFolder, ".stl") === '') {
+
+      }
+    })
+  }
+});
+
+
 io.on("connection", socket => {
   console.log("New client connected");
   //Here we listen on a new namespace called "incoming data"
@@ -186,6 +246,34 @@ io.on("connection", socket => {
 
   socket.on("print model", (url) =>{
     console.log("url:" + url);
+   rp(url)
+        .then(function(html){
+          if ($('.vault-cont > .files > .file > strong', html).text().includes(".zip")) {
+            zipName = $('.vault-cont > .files > .file > strong', html).text();
+            const modelDownload = fs.createWriteStream(modelDownloadFolder + zipName);
+            const request = http.get(modelPrintURL + zipName, function(response) {
+              response.pipe(modelDownload);
+            });
+          }
+        })
+        .catch(function(err){
+          //handle error
+        });
+    (async () => {
+      const browser = await puppeteer.launch({
+          headless: false
+      });
+
+      const page = await browser.newPage();
+
+      await page.goto(url);
+
+      await page.click('.btn-download');
+
+      await page.click('.file');
+
+      page.close();
+    })();
 
   });
 
