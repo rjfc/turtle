@@ -10,7 +10,8 @@ const express = require('express'),
       fs = require("fs"),
       puppeteer = require("puppeteer"),
       extract = require('extract-zip'),
-      path = require('path');
+      path = require('path'),
+      shell = require('shelljs');
 
 const Nightmare = require('nightmare');
 require('nightmare-download-manager')(Nightmare);
@@ -23,8 +24,8 @@ const modelDownloadFolder = "/Users/Russell/Downloads/";
 var zipName = '';
 
 var myPort = new serialport(portName,{
-  baudRate:250000,
-  parser:new serialport.parsers.Readline("\r\n")
+  baudRate: 250000,
+  parser: new serialport.parsers.Readline("\r\n")
 });
 
 const parser =  myPort.pipe(new Readline({ delimiter: "\n"}));
@@ -195,10 +196,17 @@ fs.watch(modelDownloadFolder, (eventType, filename) => {
   if (filename.includes(zipName.replace(".zip","")) && getFilesizeInBytes(modelDownloadFolder+filename) > 0) {
     console.log("filename:" + filename);
     var dest = modelDownloadFolder + filename.replace(".zip", "");
+    // shell.exec
     extract(modelDownloadFolder + filename, {dir: dest}, function (err) {
       // If .obj file found but .stl is not
-      if (findModel(modelDownloadFolder, ".obj") !== '' && findModel(modelDownloadFolder, ".stl") === '') {
+      if (findModel(dest, ".obj").length > 0 && !findModel(dest, ".stl")) {
+          // can add scaling value to command
+          shell.exec("python obj2stl.py \"" + findModel(dest, ".obj") + "\" ./temp/BANANA.stl");
+      }
+      // If .stl file found but .obj is not
+      else if (!findModel(dest, ".obj")  && findModel(dest, ".stl").length > 0) {
 
+          console.log("stl found");
       }
     })
   }

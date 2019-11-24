@@ -11,7 +11,7 @@ class SearchModels extends Component {
         super(props);
         this.state = {
             response: 0,
-            endpoint: "http://10.36.37.180:5000", //can change to http://127.0.0.1:5000  to run on local machine
+            endpoint: "http://10.38.134.211:5000/", //can change to http://127.0.0.1:5000  to run on local machine
             searchResultsActive: true,
             searchModelsInfo: '',
             searchValue: '',
