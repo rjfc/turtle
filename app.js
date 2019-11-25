@@ -15,6 +15,8 @@ const express = require('express'),
       lineReader = require("line-reader"),
       Nightmare = require('nightmare');
 
+const chokidar = require('chokidar');
+
 const nightmare = Nightmare({ show: true });
 
 var portName = "/dev/cu.usbmodem14101";
@@ -28,7 +30,7 @@ var myPort = new serialport(portName,{
   parser: new serialport.parsers.Readline("\r\n")
 });
 
-const parser =  myPort.pipe(new Readline({ delimiter: "\n"}));
+const parser = myPort.pipe(new Readline({ delimiter: "\n"}));
 
 const server = http.createServer(app);
 const io = socketIO(server);
@@ -134,10 +136,15 @@ function findModel(startPath, filter){
   };
 };
 
-
+var extractAndConvertDone = {}; // or fs.watch fires multiple times :(
 // Download folder watch
 fs.watch(modelDownloadFolder, (eventType, filename) => {
-  if (filename.includes(zipName.replace(".zip","")) && getFilesizeInBytes(modelDownloadFolder+filename) > 0) {
+  if (filename.includes(zipName.replace(".zip","")) && filename.includes(".zip") && getFilesizeInBytes(modelDownloadFolder+filename) > 0) {
+    var path = modelDownloadFolder+filename;
+    var stats = fs.statSync(path);
+    let seconds = +stats.mtime;
+    if(extractAndConvertDone[filename] === seconds) return;
+      extractAndConvertDone[filename] = seconds;
     console.log("filename:" + filename);
     var dest = modelDownloadFolder + filename.replace(".zip", "");
     // shell.exec
@@ -146,6 +153,7 @@ fs.watch(modelDownloadFolder, (eventType, filename) => {
       if (findModel(dest, ".obj").length > 0 && !findModel(dest, ".stl")) {
           // can add scaling value to command
           shell.exec("python obj2stl.py \"" + findModel(dest, ".obj") + "\" ./temp/temp.stl");
+          console.log("EXECUTED");
       }
       // If .stl file found but .obj is not
       else if (!findModel(dest, ".obj")  && findModel(dest, ".stl").length > 0) {
@@ -155,36 +163,54 @@ fs.watch(modelDownloadFolder, (eventType, filename) => {
   }
 });
 
+
+var sliceDone = {};
+var gcodeSentDone = {};
 fs.watch("./temp/", (eventType, filename) => {
     if (filename === "temp.stl") {
+        var path = "./temp/temp.stl";
+        var stats = fs.statSync(path);
+        let seconds = +stats.mtime;
+        if(sliceDone[filename] === seconds) return;
+        sliceDone[filename] = seconds;
         shell.exec("CuraEngine/build/CuraEngine slice -v -j CuraEngine/fdmprinter.def.json -o  temp/temp.gcode -l temp/temp.stl");
     }
     else if (filename === "temp.gcode") {
+        var path = "./temp/temp.gcode";
+        var stats = fs.statSync(path);
+        let seconds = +stats.mtime;
+        if(gcodeSentDone[filename] === seconds) return;
+        gcodeSentDone[filename] = seconds;
         // open gcode file
-        lineReader.eachLine('temp/temp.gcode', function(line, last) {
-      //      console.log(line);
-            // for each line in gcode, check if comment
-            //if not comment and not empty/just whitespace
-            var trimmedLine = line.substring(0, line.indexOf(";"));
-            if (trimmedLine && /\S/.test(trimmedLine) && trimmedLine !== '') {
-                //strip leading and ending whitespace from line of gcode
-                // append '\n' to line of gcode
-                trimmedLine = trimmedLine.trim() + '\n';
-                // write resulting line to port
-                myPort.write(Buffer.from(trimmedLine),function(err,result){
-                    if(err){
-                        console.log('ERR: ' + err);
-                    }
-                    // print response
-                    console.log("line: " + trimmedLine + "\n");
-                    console.log(result);
-                });
-            }
-            if(last){
+        setTimeout(function(){
+            lineReader.eachLine('temp/temp.gcode', function(line, last) {
+          //      console.log(line);
+                // for each line in gcode, check if comment
+                //if not comment and not empty/just whitespace
+                var trimmedLine;
+                if (line.includes(";")) {
+                    trimmedLine = line.substring(0, line.indexOf(";"));
+                }
+                else {
+                    trimmedLine = line;
+                }
 
-            }
-        });
+                if (trimmedLine && /\S/.test(trimmedLine) && trimmedLine !== '') {
+                    //strip leading and ending whitespace from line of gcode
+                    // append '\n' to line of gcode
+                    trimmedLine = trimmedLine.trim() + '\n';
+                    // write resulting line to port
+                    myPort.write(Buffer.from(trimmedLine),function(err,result){
+                        // print response
+                        console.log("line: " + trimmedLine);
+                        console.log(result);
+                    });
+                }
+                if(last){
 
+                }
+            });
+        }, 3000);
     }
 });
 
