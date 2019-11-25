@@ -9,15 +9,15 @@ const express = require('express'),
       $ = require("cheerio"),
       fs = require("fs"),
       puppeteer = require("puppeteer"),
-      extract = require('extract-zip'),
-      path = require('path'),
-      shell = require('shelljs');
+      extract = require("extract-zip"),
+      path = require("path"),
+      shell = require("shelljs"),
+      lineReader = require("line-reader"),
+      Nightmare = require('nightmare');
 
-const Nightmare = require('nightmare');
-require('nightmare-download-manager')(Nightmare);
 const nightmare = Nightmare({ show: true });
 
-var portName = "/dev/cu.usbmodem14201";
+var portName = "/dev/cu.usbmodem14101";
 var modelDatabaseURL = "https://free3d.com/3d-models/";
 var modelPrintURL = "https://static.free3d.com/models/123d/printable_catalog/";
 const modelDownloadFolder = "/Users/Russell/Downloads/";
@@ -53,7 +53,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.get('/port/status', (req, res) => {
   res.send({ express: portStatus });
 });
-
+/*
 app.get('/stats/timeElapsed', (req, res) => {
   myPort.write(Buffer.from("M31\n"),function(err,result){
     if(err){
@@ -79,7 +79,7 @@ app.get('/stats/currentPosition', (req, res) => {
     }
   });
   res.send({ express: currentPosition });
-});
+});*/
 
 app.post('/models/search', (req, res) => {
   //${req.body.post} is the search data.
@@ -155,6 +155,7 @@ function onData(data) {
     currentPosition.Y = dataString.substring(dataString.indexOf("Y:") + 2, dataString.indexOf("Z:"));
     currentPosition.Z = dataString.substring(dataString.indexOf("Z:") + 2, dataString.indexOf("E:"));
   }
+
 }
 
 nightmare.on('download', function(state, downloadItem){
@@ -192,6 +193,7 @@ function findModel(startPath, filter){
 };
 
 
+// Download folder watch
 fs.watch(modelDownloadFolder, (eventType, filename) => {
   if (filename.includes(zipName.replace(".zip","")) && getFilesizeInBytes(modelDownloadFolder+filename) > 0) {
     console.log("filename:" + filename);
@@ -201,17 +203,48 @@ fs.watch(modelDownloadFolder, (eventType, filename) => {
       // If .obj file found but .stl is not
       if (findModel(dest, ".obj").length > 0 && !findModel(dest, ".stl")) {
           // can add scaling value to command
-          shell.exec("python obj2stl.py \"" + findModel(dest, ".obj") + "\" ./temp/BANANA.stl");
+          shell.exec("python obj2stl.py \"" + findModel(dest, ".obj") + "\" ./temp/temp.stl");
       }
       // If .stl file found but .obj is not
       else if (!findModel(dest, ".obj")  && findModel(dest, ".stl").length > 0) {
-
           console.log("stl found");
       }
     })
   }
 });
 
+fs.watch("./temp/", (eventType, filename) => {
+    if (filename === "temp.stl") {
+        shell.exec("CuraEngine/build/CuraEngine slice -v -j CuraEngine/fdmprinter.def.json -o  temp/temp.gcode -l temp/temp.stl");
+    }
+    else if (filename === "temp.gcode") {
+        // open gcode file
+        lineReader.eachLine('temp/temp.gcode', function(line, last) {
+      //      console.log(line);
+            // for each line in gcode, check if comment
+            //if not comment and not empty/just whitespace
+            var trimmedLine = line.substring(0, line.indexOf(";"));
+            if (trimmedLine && /\S/.test(trimmedLine) && trimmedLine !== '') {
+                //strip leading and ending whitespace from line of gcode
+                // append '\n' to line of gcode
+                trimmedLine = trimmedLine.trim() + '\n';
+                // write resulting line to port
+                myPort.write(Buffer.from(trimmedLine),function(err,result){
+                    if(err){
+                        console.log('ERR: ' + err);
+                    }
+                    // print response
+                    console.log("line: " + trimmedLine + "\n");
+                    console.log(result);
+                });
+            }
+            if(last){
+
+            }
+        });
+
+    }
+});
 
 io.on("connection", socket => {
   console.log("New client connected");
