@@ -53,61 +53,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.get('/port/status', (req, res) => {
   res.send({ express: portStatus });
 });
-/*
-app.get('/stats/timeElapsed', (req, res) => {
-  myPort.write(Buffer.from("M31\n"),function(err,result){
-    if(err){
-      console.log('ERR: ' + err);
-    }
-  });
-  res.send({ express: timeElapsed });
-});
-
-app.get('/stats/hotendTemperature', (req, res) => {
-  myPort.write(Buffer.from("M105\n"),function(err,result){
-    if(err){
-      console.log('ERR: ' + err);
-    }
-  });
-  res.send({ express: hotendTemperature });
-});
-
-app.get('/stats/currentPosition', (req, res) => {
-  myPort.write(Buffer.from("M114\n"),function(err,result){
-    if(err){
-      console.log('ERR: ' + err);
-    }
-  });
-  res.send({ express: currentPosition });
-});*/
-
-app.post('/models/search', (req, res) => {
-  //${req.body.post} is the search data.
- /* rp(modelDatabaseURL)
-      .then(function(html){
-        //success!
-        console.log(html);
-      })
-      .catch(function(err){
-        //handle error
-      });*/
- //console.log(req.body.searchValue);
-  console.log(req.body.searchValue);
-  /*rp(modelDatabaseURL + req.body.searchValue)
-      .then(function(html){
-        const modelLinks = [];
-        const modelThumbnails = [];
-        console.log($('.search-result__content-wrapper > .search-result__thumb-wrapper', html).length);
-        for (let i = 0; i < $('.search-result__content-wrapper > .search-result__thumb-wrapper', html).length; i++) {
-          modelLinks.push($('.search-result__content-wrapper > .search-result__thumb-wrapper', html)[i].attribs.href);
-          modelThumbnails.push($('.search-result__content-wrapper > .search-result__thumb-wrapper > img', html)[i].attribs.src);
-        }
-        res.send ({ express: modelThumbnails });
-      })
-      .catch(function(err){
-        //handle error
-      });*/
-});
 
 /*
 app.post('/api/world', (req, res) => {
@@ -171,9 +116,6 @@ function getFilesizeInBytes(filename) {
 }
 
 function findModel(startPath, filter){
-
-  //console.log('Starting from dir '+startPath+'/');
-
  if (!fs.existsSync(startPath)){
     return '';
   }
@@ -186,7 +128,7 @@ function findModel(startPath, filter){
       findModel(fileName, filter);
     }
     else if (fileName.indexOf(filter) >= 0) {
-      // found
+      // Found
       return fileName;
     };
   };
@@ -287,7 +229,7 @@ io.on("connection", socket => {
 
   socket.on("print model", (url) =>{
     console.log("url:" + url);
-   rp(url)
+    rp(url)
         .then(function(html){
           if ($('.vault-cont > .files > .file > strong', html).text().includes(".zip")) {
             zipName = $('.vault-cont > .files > .file > strong', html).text();
@@ -315,7 +257,33 @@ io.on("connection", socket => {
 
       page.close();
     })();
+  });
 
+  socket.on("get printer stats", () =>{
+      // Time elapsed
+      myPort.write(Buffer.from("M31\n"),function(err,result){
+          if(err){
+              console.log('ERR: ' + err);
+          }
+      });
+      // Temperature
+      myPort.write(Buffer.from("M105\n"),function(err,result){
+          if(err){
+              console.log('ERR: ' + err);
+          }
+      });
+      // Position
+      myPort.write(Buffer.from("M114\n"),function(err,result){
+          if(err){
+              console.log('ERR: ' + err);
+          }
+          const printerStats = {
+              timeElapsed: timeElapsed,
+              temperature: hotendTemperature,
+              position: currentPosition
+          };
+          io.sockets.emit("printer stats", printerStats);
+      });
   });
 
   //A special namespace "disconnect" for when a client disconnects

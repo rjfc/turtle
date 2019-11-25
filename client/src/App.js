@@ -71,20 +71,7 @@ class App extends Component {
             <div className="App">
                 <Home button1Text = {"PRINTER STATISTICS"}
                       button2Text = {"SEARCH 3D MODELS"}
-                      portStatus = {this.state.portStatusResponse}
-                      Label1Name = {"Time Elapsed"}
-                      Label1Value = {this.state.timeElapsedResponse}
-                      Label2Name = {"Hotend Temperature"}
-                      Label2Value = {this.state.hotendTemperatureResponse + "°"}
-                      Label3Name = {"X Position"}
-                      Label3Value = {this.state.currentPositionResponse.X}
-                      Label4Name = {"Y Position"}
-                      Label4Value = {this.state.currentPositionResponse.Y}
-                      Label5Name = {"Z Position"}
-                      Label5Value = {this.state.currentPositionResponse.Z}
-                      placeholderText = {"Search 3D models"}
-                      formAction = {"/models/search"}>
-
+                      placeholderText = {"Search 3D models"}>
                 </Home>
 
             </div>

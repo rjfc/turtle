@@ -45,35 +45,11 @@ class Home extends Component {
             searchModelsActive: true
         });
     }
-/*
-    searchModels = async e => {
-        e.preventDefault();
-        const response = await fetch('/models/search', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ post: this.state.post }),
-        });
-        const body = await response.text();
 
-        this.setState({ responseToPost: body });
-    };
-*/
     render() {
         const { portStatus } = this.props;
         const { button1Text } = this.props;
         const { button2Text } = this.props;
-        const { Label1Name } = this.props;
-        const { Label1Value } = this.props;
-        const { Label2Name } = this.props;
-        const { Label2Value } = this.props;
-        const { Label3Name } = this.props;
-        const { Label3Value } = this.props;
-        const { Label4Name } = this.props;
-        const { Label4Value } = this.props;
-        const { Label5Name } = this.props;
-        const { Label5Value } = this.props;
         const { placeholderText } = this.props;
 
         if (this.state.homeActive && !this.state.printerStatsActive && !this.state.searchModelsActive) {
@@ -94,16 +70,7 @@ class Home extends Component {
                 <div className="Printer-stats-container">
                     <BackButton clickEvent = { this.LoadHome } />
                     <LogoHeader headerClass = {"Printer-stats-header"} />
-                    <PrinterStats Label1Name = { Label1Name }
-                                  Label1Value = { Label1Value }
-                                  Label2Name = { Label2Name }
-                                  Label2Value = { Label2Value }
-                                  Label3Name = { Label3Name }
-                                  Label3Value = { Label3Value }
-                                  Label4Name = { Label4Name }
-                                  Label4Value = { Label4Value }
-                                  Label5Name = { Label5Name }
-                                  Label5Value = { Label5Value }/>
+                    <PrinterStats />
                     <PortStatus portStatus = { portStatus }/>
                 </div>
             )
@@ -111,8 +78,7 @@ class Home extends Component {
         else if (this.state.searchModelsActive && !this.state.homeActive && !this.state.printerStatsActive) {
             return (
                 <div className="Search-models-container">
-
-                    <SearchModels placeholderText = { placeholderText } formAction = {"/models/search"} />
+                    <SearchModels placeholderText = { placeholderText } />
                 </div>
             )
         }

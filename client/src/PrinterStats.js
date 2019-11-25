@@ -1,25 +1,45 @@
 import React, { Component } from 'react'
 import PrinterStatsLabel from "./PrinterStatsLabel";
+import socketIOClient from "socket.io-client";
 
 class PrinterStats extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            response: 0,
+            endpoint: "http://10.36.37.180:5000/", //can change to http://127.0.0.1:5000  to run on local machine,
+            printerStats: {
+                timeElapsed: '',
+                temperature: '',
+                position: {
+                    X: '',
+                    Y: '',
+                    Z: ''
+                }
+            }
+        };
+    }
+
+    componentDidMount() {
+        const {endpoint} = this.state;
+        //Very simply connect to the socket
+        const socket = socketIOClient(endpoint);
+        //Listen for data on the "outgoing data" namespace and supply a callback for what to do when we get one. In this case, we set a state variable'
+        setInterval(async () => {
+            socket.emit("get printer stats");
+        }, 1000);
+
+        socket.on("printer stats", data => this.setState({printerStats: data}));
+    }
+
     render() {
-        const { Label1Name } = this.props;
-        const { Label1Value } = this.props;
-        const { Label2Name } = this.props;
-        const { Label2Value } = this.props;
-        const { Label3Name } = this.props;
-        const { Label3Value } = this.props;
-        const { Label4Name } = this.props;
-        const { Label4Value } = this.props;
-        const { Label5Name } = this.props;
-        const { Label5Value } = this.props;
         return (
             <div>
-                <PrinterStatsLabel LabelName={Label1Name} LabelValue={Label1Value}/>
-                <PrinterStatsLabel LabelName={Label2Name} LabelValue={Label2Value}/>
-                <PrinterStatsLabel LabelName={Label3Name} LabelValue={Label3Value}/>
-                <PrinterStatsLabel LabelName={Label4Name} LabelValue={Label4Value}/>
-                <PrinterStatsLabel LabelName={Label5Name} LabelValue={Label5Value}/>
+                <PrinterStatsLabel LabelName={"Time Elapsed"} LabelValue={this.state.printerStats.timeElapsed}/>
+                <PrinterStatsLabel LabelName={"Temperature"} LabelValue={this.state.printerStats.temperature}/>
+                <PrinterStatsLabel LabelName={"X Position"} LabelValue={this.state.printerStats.position.X}/>
+                <PrinterStatsLabel LabelName={"Y Position"} LabelValue={this.state.printerStats.position.Y}/>
+                <PrinterStatsLabel LabelName={"Z Position"} LabelValue={this.state.printerStats.position.Z}/>
             </div>
         )
     }
