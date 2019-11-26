@@ -166,58 +166,61 @@ fs.watch(modelDownloadFolder, (eventType, filename) => {
 });
 
 
-var sliceDone = {};
-var gcodeSentDone = {};
-fs.watch("./temp/", (eventType, filename) => {
-    if (filename === "temp.stl") {
-        var path = "./temp/temp.stl";
-        var stats = fs.statSync(path);
-        let seconds = +stats.mtime;
-        if(sliceDone[filename] === seconds) return;
-        sliceDone[filename] = seconds;
-        shell.exec("CuraEngine/build/CuraEngine slice -v -j CuraEngine/fdmprinter.def.json -o  temp/temp.gcode -l temp/temp.stl");
-    }
-    else if (filename === "temp.gcode") {
-        var path = "./temp/temp.gcode";
-        var stats = fs.statSync(path);
-        let seconds = +stats.mtime;
-        if(gcodeSentDone[filename] === seconds) return;
-        gcodeSentDone[filename] = seconds;
-        // open gcode file
-        setTimeout(function(){
-            lineReader.eachLine('temp/temp.gcode', function(line, last) {
-          //      console.log(line);
-                // for each line in gcode, check if comment
-                //if not comment and not empty/just whitespace
-                var trimmedLine;
-                if (line.includes(";")) {
-                    trimmedLine = line.substring(0, line.indexOf(";"));
-                }
-                else {
-                    trimmedLine = line;
-                }
-
-                if (trimmedLine && /\S/.test(trimmedLine) && trimmedLine !== '') {
-                    //strip leading and ending whitespace from line of gcode
-                    // append '\n' to line of gcode
-                    trimmedLine = trimmedLine.trim() + '\n';
-                    // write resulting line to port
-                    myPort.write(Buffer.from(trimmedLine),function(err,result){
-                        // print response
-                        console.log("Line: " + trimmedLine);
-                        console.log(result);
-                    });
-                }
-                if(last){
-
-                }
-            });
-        }, 3000);
-    }
-});
-
 io.on("connection", socket => {
   console.log("New client connected");
+
+    var sliceDone = {};
+    var gcodeSentDone = {};
+    fs.watch("./temp/", (eventType, filename) => {
+        if (filename === "temp.stl") {
+            var path = "./temp/temp.stl";
+            var stats = fs.statSync(path);
+            let seconds = +stats.mtime;
+            if(sliceDone[filename] === seconds) return;
+            sliceDone[filename] = seconds;
+            io.sockets.emit("print status", "slicing");
+            shell.exec("CuraEngine/build/CuraEngine slice -v -j CuraEngine/fdmprinter.def.json -o  temp/temp.gcode -l temp/temp.stl");
+        }
+        else if (filename === "temp.gcode") {
+            var path = "./temp/temp.gcode";
+            var stats = fs.statSync(path);
+            let seconds = +stats.mtime;
+            if(gcodeSentDone[filename] === seconds) return;
+            gcodeSentDone[filename] = seconds;
+            // open gcode file
+            setTimeout(function(){
+                io.sockets.emit("print status", "printing");
+                lineReader.eachLine('temp/temp.gcode', function(line, last) {
+                    //      console.log(line);
+                    // for each line in gcode, check if comment
+                    //if not comment and not empty/just whitespace
+                    var trimmedLine;
+                    if (line.includes(";")) {
+                        trimmedLine = line.substring(0, line.indexOf(";"));
+                    }
+                    else {
+                        trimmedLine = line;
+                    }
+
+                    if (trimmedLine && /\S/.test(trimmedLine) && trimmedLine !== '') {
+                        //strip leading and ending whitespace from line of gcode
+                        // append '\n' to line of gcode
+                        trimmedLine = trimmedLine.trim() + '\n';
+                        // write resulting line to port
+                        myPort.write(Buffer.from(trimmedLine),function(err,result){
+                            // print response
+                            console.log("Line: " + trimmedLine);
+                            console.log(result);
+                        });
+                    }
+                    if(last){
+
+                    }
+                });
+            }, 3000);
+        }
+    });
+
   //Here we listen on a new namespace called "incoming data"
   socket.on("search models", (data)=>{
     //Here we broadcast it out to all other sockets EXCLUDING the socket which sent us the data

@@ -55,3 +55,8 @@ input, input:before, input:after {
 .slide, .slide > div {
   background-color: transparent !important;
 }
+
+.Printing-screen-header {
+  font-weight: bold;
+  font-size: 200px;
+}

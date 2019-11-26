@@ -6,7 +6,8 @@ import { Carousel } from 'react-responsive-carousel';
 import ModelInfo from "./ModelInfo";
 import BackButton from "./BackButton";
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
-import Loader from 'react-loader-spinner'
+import LoadingOverlay from "./LoadingOverlay";
+import PrintingScreen from "./PrintingScreen";
 
 class SearchModels extends Component {
     constructor(props) {
@@ -18,8 +19,11 @@ class SearchModels extends Component {
             searchModelsInfo: '',
             searchValue: '',
             modelInfo: '',
-            loading: false,
-            loadingText: ''
+            loadingModels: false,
+            loadingModelsText: '',
+            printing: false,
+            printingText: '',
+            printingScreenActive: false
         };
 
         this.sendSearchData = this.sendSearchData.bind(this);
@@ -37,15 +41,28 @@ class SearchModels extends Component {
         //Listen for data on the "outgoing data" namespace and supply a callback for what to do when we get one. In this case, we set a state variable'
         socket.on("search models thumbnails", data => this.setState({searchModelsInfo: data}));
         socket.on("model info", data => this.setState({modelInfo: data, searchResultsActive: false}));
-        socket.on("search models num results", data => this.setState({loadingText: data + " results found for \"" + this.state.searchValue + "\"..."}))
+        socket.on("search models num results", data => this.setState({loadingModelsText: data + " results found for \"" + this.state.searchValue + "\"..."}));
+        socket.on('print status', (data) => {
+            if (data === "slicing") {
+                this.setState({
+                    printingText: "Slicing \"" + this.state.modelInfo.name + "\"..."
+                });
+            }
+            else if (data === "printing") {
+                console.log("hello");
+                this.setState({
+                    printingScreenActive: true
+                });
+            }
+        });
     }
 
     sendSearchData() {
         const {endpoint} = this.state;
         const socket = socketIOClient(endpoint);
         this.setState({
-            loading: true,
-            loadingText: "Getting results for \"" + this.state.searchValue + "\"..."
+            loadingModels: true,
+            loadingModelsText: "Getting results for \"" + this.state.searchValue + "\"..."
         });
         socket.emit("search models", this.state.searchValue);
     }
@@ -76,6 +93,10 @@ class SearchModels extends Component {
     printModel(url) {
         const {endpoint} = this.state;
         const socket = socketIOClient(endpoint);
+        this.setState({
+            printing: true,
+            printingText: "Downloading \"" + this.state.modelInfo.name + "\" ..."
+        });
         socket.emit("print model", url);
     }
 
@@ -84,19 +105,10 @@ class SearchModels extends Component {
         const { modelInfo } = this.state;
         const { placeholderText } = this.props;
         const { loadHomeEvent } = this.props;
-        if(searchModelsInfo === '' && modelInfo === '') {
+        if(searchModelsInfo === '' && modelInfo === '' && !this.state.printingScreenActive) {
             return (
                 <div>
-                    <div className="Loading-overlay" style={{display: this.state.loading ? 'block' : 'none'}}>
-                        <span className="Loading-text">{ this.state.loadingText }</span>
-                        <div className="Loading-spinner">
-                        <Loader
-                            type="TailSpin"
-                            color="#0eba48"
-                            height={100}
-                            width={100} />
-                        </div>
-                    </div>
+                    <LoadingOverlay overlayStyle={{display: this.state.loadingModels ? 'block' : 'none'}} overlayText={ this.state.loadingModelsText } />
                     <BackButton clickEvent = { loadHomeEvent } />
                     <LogoHeader headerClass = {"Load-models-header"} />
                     <div className="Large-search-container">
@@ -109,7 +121,7 @@ class SearchModels extends Component {
                 </div>
             )
         }
-        else if (searchModelsInfo !== '' && modelInfo === '' && this.state.searchResultsActive) {
+        else if (searchModelsInfo !== '' && modelInfo === '' && this.state.searchResultsActive && !this.state.printingScreenActive) {
             return (
                 <div>
                     <BackButton clickEvent = { loadHomeEvent } />
@@ -154,9 +166,19 @@ class SearchModels extends Component {
                 </div>
             )
         }
-        else if (!this.state.searchResultsActive) {
+        else if (!this.state.searchResultsActive && !this.state.printingScreenActive) {
             return (
-                <ModelInfo modelName={modelInfo.name} modelThumbnail={modelInfo.thumbnail} viewOtherModelsClickEvent={this.loadSearchResults} printModelClickEvent={() => {this.printModel(modelInfo.url)}}/>
+                <div>
+                    <LoadingOverlay overlayStyle={{display: this.state.printing ? 'block' : 'none'}} overlayText={this.state.printingText} />
+                    <ModelInfo modelName={modelInfo.name} modelThumbnail={modelInfo.thumbnail} viewOtherModelsClickEvent={this.loadSearchResults} printModelClickEvent={() => {this.printModel(modelInfo.url)}}/>
+                </div>
+            )
+        }
+        else if (this.state.printingScreenActive) {
+            return (
+                <div>
+                    <PrintingScreen modelName={modelInfo.name} />
+                </div>
             )
         }
     }
