@@ -150,14 +150,16 @@ fs.watch(modelDownloadFolder, (eventType, filename) => {
     // shell.exec
     extract(modelDownloadFolder + filename, {dir: dest}, function (err) {
       // If .obj file found but .stl is not
-      if (findModel(dest, ".obj").length > 0 && !findModel(dest, ".stl")) {
+        console.log(findModel(modelDownloadFolder, ".obj") + " | " + findModel(modelDownloadFolder, ".stl"));
+      if (findModel(modelDownloadFolder, ".obj") && !findModel(modelDownloadFolder, ".stl")) {
           // can add scaling value to command
-          shell.exec("python obj2stl.py \"" + findModel(dest, ".obj") + "\" ./temp/temp.stl");
-          console.log("EXECUTED");
+          shell.exec("python obj2stl.py \"" + findModel(modelDownloadFolder, ".obj") + "\" ./temp/temp.stl");
       }
-      // If .stl file found but .obj is not
-      else if (!findModel(dest, ".obj")  && findModel(dest, ".stl").length > 0) {
-          console.log("stl found");
+      // If .stl found
+      else{
+          fs.rename(findModel(modelDownloadFolder, ".stl"), "./temp/temp.stl",(err) => {
+              if (err) throw err;
+          });
       }
     })
   }
@@ -202,7 +204,7 @@ fs.watch("./temp/", (eventType, filename) => {
                     // write resulting line to port
                     myPort.write(Buffer.from(trimmedLine),function(err,result){
                         // print response
-                        console.log("line: " + trimmedLine);
+                        console.log("Line: " + trimmedLine);
                         console.log(result);
                     });
                 }
