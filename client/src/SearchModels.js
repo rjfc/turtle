@@ -39,7 +39,7 @@ class SearchModels extends Component {
         //Very simply connect to the socket
         const socket = socketIOClient(endpoint);
         //Listen for data on the "outgoing data" namespace and supply a callback for what to do when we get one. In this case, we set a state variable'
-        socket.on("search models thumbnails", data => this.setState({searchModelsInfo: data}));
+        socket.on("search models thumbnails", data => this.setState({searchModelsInfo: data, loadingModels: false}));
         socket.on("model info", data => this.setState({modelInfo: data, searchResultsActive: false}));
         socket.on("search models num results", data => this.setState({loadingModelsText: data + " results found for \"" + this.state.searchValue + "\"..."}));
         socket.on('print status', (data) => {
@@ -124,6 +124,7 @@ class SearchModels extends Component {
         else if (searchModelsInfo !== '' && modelInfo === '' && this.state.searchResultsActive && !this.state.printingScreenActive) {
             return (
                 <div>
+                    <LoadingOverlay overlayStyle={{display: this.state.loadingModels ? 'block' : 'none'}} overlayText={ this.state.loadingModelsText } />
                     <BackButton clickEvent = { loadHomeEvent } />
                     <LogoHeader headerClass = {"Load-models-loaded-header"} />
                     <div className="Large-search-loaded-container">
