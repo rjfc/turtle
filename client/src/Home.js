@@ -78,7 +78,7 @@ class Home extends Component {
         else if (this.state.searchModelsActive && !this.state.homeActive && !this.state.printerStatsActive) {
             return (
                 <div className="Search-models-container">
-                    <SearchModels placeholderText = { placeholderText } />
+                    <SearchModels placeholderText = { placeholderText } loadHomeEvent = { this.LoadHome } />
                 </div>
             )
         }

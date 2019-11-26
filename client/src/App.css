@@ -329,3 +329,29 @@
   font-size: 2.6vh;
   cursor: pointer;
 }
+
+.Loading-overlay {
+  background-color: rgba(0, 0, 0, 0.68);
+  position: absolute;
+  z-index: 5;
+  height: 100%;
+  width: 100%;
+}
+
+.Loading-spinner {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.Loading-text {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: bold;
+  font-size: 4vh;
+  color: #48a055;
+  position: absolute;
+  top: 55%;
+  left: 50%;
+  transform: translate(-50%, -30%);
+}

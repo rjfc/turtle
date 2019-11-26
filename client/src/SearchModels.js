@@ -5,17 +5,21 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from 'react-responsive-carousel';
 import ModelInfo from "./ModelInfo";
 import BackButton from "./BackButton";
+import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
+import Loader from 'react-loader-spinner'
 
 class SearchModels extends Component {
     constructor(props) {
         super(props);
         this.state = {
             response: 0,
-            endpoint: "http://10.36.37.180:5000/", //can change to http://127.0.0.1:5000  to run on local machine
+            endpoint: "http://10.36.23.89:5000/", //can change to http://127.0.0.1:5000  to run on local machine
             searchResultsActive: true,
             searchModelsInfo: '',
             searchValue: '',
-            modelInfo: ''
+            modelInfo: '',
+            loading: false,
+            loadingText: ''
         };
 
         this.sendSearchData = this.sendSearchData.bind(this);
@@ -33,12 +37,16 @@ class SearchModels extends Component {
         //Listen for data on the "outgoing data" namespace and supply a callback for what to do when we get one. In this case, we set a state variable'
         socket.on("search models thumbnails", data => this.setState({searchModelsInfo: data}));
         socket.on("model info", data => this.setState({modelInfo: data, searchResultsActive: false}));
+        socket.on("search models num results", data => this.setState({loadingText: data + " results found for \"" + this.state.searchValue + "\"..."}))
     }
 
     sendSearchData() {
         const {endpoint} = this.state;
         const socket = socketIOClient(endpoint);
-
+        this.setState({
+            loading: true,
+            loadingText: "Getting results for \"" + this.state.searchValue + "\"..."
+        });
         socket.emit("search models", this.state.searchValue);
     }
 
@@ -75,10 +83,21 @@ class SearchModels extends Component {
         const { searchModelsInfo } = this.state;
         const { modelInfo } = this.state;
         const { placeholderText } = this.props;
-        if (searchModelsInfo === '' && modelInfo === '') {
+        const { loadHomeEvent } = this.props;
+        if(searchModelsInfo === '' && modelInfo === '') {
             return (
                 <div>
-                    <BackButton clickEvent = { this.LoadHome } />
+                    <div className="Loading-overlay" style={{display: this.state.loading ? 'block' : 'none'}}>
+                        <span className="Loading-text">{ this.state.loadingText }</span>
+                        <div className="Loading-spinner">
+                        <Loader
+                            type="TailSpin"
+                            color="#0eba48"
+                            height={100}
+                            width={100} />
+                        </div>
+                    </div>
+                    <BackButton clickEvent = { loadHomeEvent } />
                     <LogoHeader headerClass = {"Load-models-header"} />
                     <div className="Large-search-container">
                         <div className="Large-search-submit" onClick = {this.sendSearchData}>GO</div>
@@ -93,7 +112,7 @@ class SearchModels extends Component {
         else if (searchModelsInfo !== '' && modelInfo === '' && this.state.searchResultsActive) {
             return (
                 <div>
-                    <BackButton clickEvent = { this.LoadHome } />
+                    <BackButton clickEvent = { loadHomeEvent } />
                     <LogoHeader headerClass = {"Load-models-loaded-header"} />
                     <div className="Large-search-loaded-container">
                         <div className="Large-search-submit" onClick={this.sendSearchData}>GO</div>
