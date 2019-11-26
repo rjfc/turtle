@@ -324,6 +324,13 @@ io.on("connection", socket => {
           };
           io.sockets.emit("printer stats", printerStats);
       });
+
+
+  });
+
+  socket.on("get printer status", () => {
+      // Change so this fires on status change (not asking every x seconds)
+      io.sockets.emit("printer status", portStatus);
   });
 
   //A special namespace "disconnect" for when a client disconnects

@@ -1,16 +1,26 @@
 import React, { Component }  from 'react';
 import './App.css';
 import Home from './Home.js';
+import socketIOClient from "socket.io-client";
 
 class App extends Component {
     state = {
-        portStatusResponse: '',
+        response: 0,
+        endpoint: "http://10.36.23.89:5000/", //can change to http://127.0.0.1:5000  to run on local machine,
+        printerStatus: '',
         timeElapsedResponse: '',
         hotendTemperatureResponse: '',
         currentPositionResponse: ''
     };
 
     componentDidMount() {
+        const {endpoint} = this.state;
+        //Very simply connect to the socket
+        const socket = socketIOClient(endpoint);
+        setInterval(async () => {
+            socket.emit("get printer status");
+        });
+        socket.on("printer status", data => this.setState({printerStatus: data}));
         /*try {
             setInterval(async () => {
                 this.getPortStatus()
@@ -33,45 +43,21 @@ class App extends Component {
 
     }
 
-    getPortStatus = async () => {
+    /*getPortStatus = async () => {
         const response = await fetch('/port/status');
         const body = await response.json();
         if (response.status !== 200) throw Error(body.message);
 
         return body;
-    };
-
-    getTimeElapsed = async () => {
-        const response = await fetch('/stats/timeElapsed');
-        const body = await response.json();
-        if (response.status !== 200) throw Error(body.message);
-
-        return body;
-    };
-
-    getHotendTemperature = async () => {
-        const response = await fetch('/stats/hotendTemperature');
-        const body = await response.json();
-        if (response.status !== 200) throw Error(body.message);
-
-        return body;
-    };
-
-    getCurrentPosition = async () => {
-        const response = await fetch('/stats/currentPosition');
-        const body = await response.json();
-        if (response.status !== 200) throw Error(body.message);
-
-        return body;
-    };
-
+    };*/
 
     render() {
         return (
             <div className="App">
                 <Home button1Text = {"PRINTER STATISTICS"}
                       button2Text = {"SEARCH 3D MODELS"}
-                      placeholderText = {"Search 3D models"}>
+                      placeholderText = {"Search 3D models"}
+                      portStatus = {this.state.printerStatus}>
                 </Home>
 
             </div>
