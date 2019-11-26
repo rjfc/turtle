@@ -222,17 +222,25 @@ io.on("connection", socket => {
     console.log(data);
     rp(modelDatabaseURL + data)
         .then(function(html){
-          modelLinks = [];
-          modelNames = [];
-          modelThumbnails = [];
-          console.log($('.page-results-container > .search-results > .search-result > .search-result__content-wrapper > .search-result__thumb-wrapper', html).length);
-          io.sockets.emit("search models num results", $('.page-results-container > .search-results > .search-result > .search-result__content-wrapper > .search-result__thumb-wrapper', html).length);
+            modelLinks = [];
+            modelNames = [];
+            modelThumbnails = [];
+            var qualifiedModels = [];
+            for (let i = 0; i < $('.page-results-container > .search-results > .search-result > .search-result__content-wrapper > .search-result__info-wrapper > .search-result__format', html).length; i++) {
+                var formatsText = $('.page-results-container > .search-results > .search-result > .search-result__content-wrapper > .search-result__info-wrapper > .search-result__format', html)[i].children[0].data;
+                if (formatsText.includes(".stl") || formatsText.includes(".obj")) {
+                    qualifiedModels.push(i);
+
+                }
+            }
+          console.log(qualifiedModels.length);
+          io.sockets.emit("search models num results", qualifiedModels.length);
           for (let i = 0; i < $('.page-results-container > .search-results > .search-result > .search-result__content-wrapper > .search-result__thumb-wrapper', html).length; i++) {
-            modelLinks.push("https://free3d.com" + $('.page-results-container > .search-results > .search-result > .search-result__content-wrapper > .search-result__thumb-wrapper', html)[i].attribs.href);
-            modelNames.push($('.page-results-container > .search-results > .search-result > .search-result__content-wrapper > .search-result__thumb-wrapper > img', html)[i].attribs.title);
-            modelNames[i] = modelNames[i].replace("3d model", "").trim();
-            modelThumbnails.push($('.page-results-container > .search-results > .search-result > .search-result__content-wrapper > .search-result__thumb-wrapper > img', html)[i].attribs.src);
-            modelThumbnails[i] = modelThumbnails[i].replace("imgd/s", "imgd/l");
+              if (qualifiedModels.includes(i)) {
+                  modelLinks.push("https://free3d.com" + $('.page-results-container > .search-results > .search-result > .search-result__content-wrapper > .search-result__thumb-wrapper', html)[i].attribs.href);
+                  modelNames.push($('.page-results-container > .search-results > .search-result > .search-result__content-wrapper > .search-result__thumb-wrapper > img', html)[i].attribs.title.replace("3d model", "").trim());
+                  modelThumbnails.push($('.page-results-container > .search-results > .search-result > .search-result__content-wrapper > .search-result__thumb-wrapper > img', html)[i].attribs.src.replace("imgd/s", "imgd/l"));
+              }
           }
           console.log(modelNames);
           const modelsInfo = {
