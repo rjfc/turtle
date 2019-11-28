@@ -355,3 +355,26 @@
   left: 50%;
   transform: translate(-50%, -30%);
 }
+
+.Printing-screen-printing-label {
+  color: #07501e;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 4.5vh;
+  position: relative;
+  float: left;
+  clear: left;
+  left: 7vw;
+  bottom: 20px;
+}
+
+
+.Printer-stats-printing-header {
+  width: 500px;
+  overflow: hidden;
+  position: relative;
+  margin: auto;
+  bottom: 45px;
+  float: start;
+  clear: left;
+}

@@ -14,7 +14,7 @@ class SearchModels extends Component {
         super(props);
         this.state = {
             response: 0,
-            endpoint: "http://10.36.23.89:5000/", //can change to http://127.0.0.1:5000  to run on local machine
+            endpoint: "http://10.36.118.100:5000/", //can change to http://127.0.0.1:5000  to run on local machine
             searchResultsActive: true,
             searchModelsInfo: '',
             searchValue: '',
@@ -49,7 +49,6 @@ class SearchModels extends Component {
                 });
             }
             else if (data === "printing") {
-                console.log("hello");
                 this.setState({
                     printingScreenActive: true
                 });
@@ -178,7 +177,7 @@ class SearchModels extends Component {
         else if (this.state.printingScreenActive) {
             return (
                 <div>
-                    <PrintingScreen modelName={modelInfo.name} />
+                    <PrintingScreen modelName = {modelInfo.name}/>
                 </div>
             )
         }

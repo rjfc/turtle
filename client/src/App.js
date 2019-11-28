@@ -6,7 +6,7 @@ import socketIOClient from "socket.io-client";
 class App extends Component {
     state = {
         response: 0,
-        endpoint: "http://10.36.23.89:5000/", //can change to http://127.0.0.1:5000  to run on local machine,
+        endpoint: "http://10.36.118.100:5000/", //can change to http://127.0.0.1:5000  to run on local machine,
         printerStatus: '',
         timeElapsedResponse: '',
         hotendTemperatureResponse: '',

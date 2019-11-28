@@ -165,12 +165,10 @@ fs.watch(modelDownloadFolder, (eventType, filename) => {
   }
 });
 
-
+var sliceDone = {};
+var gcodeSentDone = {};
 io.on("connection", socket => {
   console.log("New client connected");
-
-    var sliceDone = {};
-    var gcodeSentDone = {};
     fs.watch("./temp/", (eventType, filename) => {
         if (filename === "temp.stl") {
             var path = "./temp/temp.stl";
@@ -300,32 +298,32 @@ io.on("connection", socket => {
   });
 
   socket.on("get printer stats", () =>{
-      // Time elapsed
-      myPort.write(Buffer.from("M31\n"),function(err,result){
-          if(err){
-              console.log('ERR: ' + err);
-          }
-      });
-      // Temperature
-      myPort.write(Buffer.from("M105\n"),function(err,result){
-          if(err){
-              console.log('ERR: ' + err);
-          }
-      });
-      // Position
-      myPort.write(Buffer.from("M114\n"),function(err,result){
-          if(err){
-              console.log('ERR: ' + err);
-          }
-          const printerStats = {
-              timeElapsed: timeElapsed,
-              temperature: hotendTemperature,
-              position: currentPosition
-          };
-          io.sockets.emit("printer stats", printerStats);
-      });
-
-
+      if (portStatus === "Online") {
+          // Time elapsed
+          myPort.write(Buffer.from("M31\n"),function(err,result){
+              if(err){
+                  console.log('ERR: ' + err);
+              }
+          });
+          // Temperature
+          myPort.write(Buffer.from("M105\n"),function(err,result){
+              if(err){
+                  console.log('ERR: ' + err);
+              }
+          });
+          // Position
+          myPort.write(Buffer.from("M114\n"),function(err,result){
+              if(err){
+                  console.log('ERR: ' + err);
+              }
+              const printerStats = {
+                  timeElapsed: timeElapsed,
+                  temperature: hotendTemperature,
+                  position: currentPosition
+              };
+              io.sockets.emit("printer stats", printerStats);
+          });
+      }
   });
 
   socket.on("get printer status", () => {

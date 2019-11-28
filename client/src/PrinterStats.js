@@ -33,8 +33,10 @@ class PrinterStats extends Component {
     }
 
     render() {
+        const { modelName } = this.props;
         return (
             <div>
+                <span style={{display: {modelName} ? 'block' : 'none'}} className="Printing-screen-printing-label">{modelName} is being printed.</span>
                 <PrinterStatsLabel LabelName={"Time Elapsed"} LabelValue={this.state.printerStats.timeElapsed}/>
                 <PrinterStatsLabel LabelName={"Temperature"} LabelValue={this.state.printerStats.temperature}/>
                 <PrinterStatsLabel LabelName={"X Position"} LabelValue={this.state.printerStats.position.X}/>
