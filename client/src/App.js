@@ -1,7 +1,6 @@
 import React, { Component }  from 'react';
 import './App.css';
 import Home from './Home.js';
-import socketIOClient from "socket.io-client";
 
 class App extends Component {
     state = {
@@ -14,13 +13,14 @@ class App extends Component {
     };
 
     componentDidMount() {
-        const {endpoint} = this.state;
+     /*  const {endpoint} = this.state;
         //Very simply connect to the socket
         const socket = socketIOClient(endpoint);
         setInterval(async () => {
+
             socket.emit("get printer status");
-        });
-        socket.on("printer status", data => this.setState({printerStatus: data}));
+        }, 2000);
+        socket.on("printer status", data => this.setState({printerStatus: data}));(/)
         /*try {
             setInterval(async () => {
                 this.getPortStatus()

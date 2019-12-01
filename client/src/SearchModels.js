@@ -23,7 +23,7 @@ class SearchModels extends Component {
             loadingModelsText: '',
             printing: false,
             printingText: '',
-            printingScreenActive: false
+            scalingFactor: 1
         };
 
         this.sendSearchData = this.sendSearchData.bind(this);
@@ -96,14 +96,29 @@ class SearchModels extends Component {
             printing: true,
             printingText: "Downloading \"" + this.state.modelInfo.name + "\" ..."
         });
-        socket.emit("print model", url);
+        var modelInfo = {
+            url: url,
+            scalingFactor: this.state.scalingFactor
+        };
+        socket.emit("print model", modelInfo);
     }
+
+    IncreaseFactor = () => {
+        this.setState({ scalingFactor: this.state.scalingFactor + 1 });
+    };
+
+    DecreaseFactor = () => {
+        if (this.state.scalingFactor > 1) {
+            this.setState({ scalingFactor: this.state.scalingFactor - 1 });
+        }
+    };
 
     render() {
         const { searchModelsInfo } = this.state;
         const { modelInfo } = this.state;
         const { placeholderText } = this.props;
         const { loadHomeEvent } = this.props;
+        const { portStatus } = this.props;
         if(searchModelsInfo === '' && modelInfo === '' && !this.state.printingScreenActive) {
             return (
                 <div>
@@ -170,14 +185,22 @@ class SearchModels extends Component {
             return (
                 <div>
                     <LoadingOverlay overlayStyle={{display: this.state.printing ? 'block' : 'none'}} overlayText={this.state.printingText} />
-                    <ModelInfo modelName={modelInfo.name} modelThumbnail={modelInfo.thumbnail} viewOtherModelsClickEvent={this.loadSearchResults} printModelClickEvent={() => {this.printModel(modelInfo.url)}}/>
+                    <ModelInfo
+                        modelName={modelInfo.name}
+                        modelThumbnail={modelInfo.thumbnail}
+                        viewOtherModelsClickEvent={this.loadSearchResults}
+                        printModelClickEvent={() => {this.printModel(modelInfo.url)}}
+                        scalingFactor = {this.state.scalingFactor}
+                        increaseFactor = {this.IncreaseFactor}
+                        decreaseFactor = {this.DecreaseFactor}
+                    />
                 </div>
             )
         }
         else if (this.state.printingScreenActive) {
             return (
                 <div>
-                    <PrintingScreen modelName = {modelInfo.name}/>
+                    <PrintingScreen modelName = {modelInfo.name} portStatus = {portStatus}/>
                 </div>
             )
         }

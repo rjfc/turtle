@@ -3,6 +3,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 import LogoHeader from "./LogoHeader";
 import ViewOtherModelsButton from "./ViewOtherModelsButton";
 import PrintModelButton from "./PrintModelButton";
+import ChangeScaling from "./ChangeScaling";
 
 class ModelInfo extends Component {
     render() {
@@ -10,6 +11,9 @@ class ModelInfo extends Component {
         const { modelThumbnail } = this.props;
         const { viewOtherModelsClickEvent } = this.props;
         const { printModelClickEvent } = this.props;
+        const { scalingFactor } = this.props;
+        const { increaseFactor } = this.props;
+        const { decreaseFactor } = this.props;
         return (
             <div>
                 <ViewOtherModelsButton clickEvent = {viewOtherModelsClickEvent}/>
@@ -22,6 +26,7 @@ class ModelInfo extends Component {
                         </div>
                     </div>
                 </div>
+                <ChangeScaling scalingFactor = {scalingFactor} decreaseFactor = {decreaseFactor} increaseFactor = {increaseFactor}/>
                 <PrintModelButton clickEvent = {printModelClickEvent}/>
             </div>
         )

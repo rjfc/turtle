@@ -48,6 +48,7 @@ var currentPosition = {
 var modelLinks = [];
 var modelNames = [];
 var modelThumbnails = [];
+var scalingFactor = 1;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -153,7 +154,7 @@ fs.watch(modelDownloadFolder, (eventType, filename) => {
         console.log(findModel(modelDownloadFolder, ".obj") + " | " + findModel(modelDownloadFolder, ".stl"));
       if (findModel(modelDownloadFolder, ".obj") && !findModel(modelDownloadFolder, ".stl")) {
           // can add scaling value to command
-          shell.exec("python obj2stl.py \"" + findModel(modelDownloadFolder, ".obj") + "\" ./temp/temp.stl 4");
+          shell.exec("python obj2stl.py \"" + findModel(modelDownloadFolder, ".obj") + "\" ./temp/temp.stl " + scalingFactor);
       }
       // If .stl found
       else{
@@ -314,9 +315,11 @@ io.on("connection", socket => {
     io.sockets.emit("model info", modelInfo);
   });
 
-  socket.on("print model", (url) =>{
-    console.log("url:" + url);
-    rp(url)
+  socket.on("print model", (modelInfo) =>{
+    console.log("url:" + modelInfo.url);
+    console.log("scaling factor: " + modelInfo.scalingFactor);
+    scalingFactor = modelInfo.scalingFactor;
+    rp(modelInfo.url)
         .then(function(html){
           if ($('.vault-cont > .files > .file > strong', html).text().includes(".zip")) {
             zipName = $('.vault-cont > .files > .file > strong', html).text();
@@ -336,7 +339,7 @@ io.on("connection", socket => {
 
       const page = await browser.newPage();
 
-      await page.goto(url);
+      await page.goto(modelInfo.url);
 
       await page.click('.btn-download');
 

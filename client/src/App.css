@@ -325,7 +325,7 @@
   box-shadow: 0px 7px #0ca540;
   border-radius: 3px;
   position: relative;
-  top: 20vh;
+  top: 12vh;
   font-size: 2.6vh;
   cursor: pointer;
 }
@@ -368,7 +368,6 @@
   bottom: 20px;
 }
 
-
 .Printer-stats-printing-header {
   width: 500px;
   overflow: hidden;
@@ -377,4 +376,56 @@
   bottom: 45px;
   float: start;
   clear: left;
+}
+
+.Scaling-Change-Container {
+  position: relative;
+  top: 21vh;
+  right: 33vw;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 4.5vh;
+  margin: auto;
+  width: 20%;
+  overflow: hidden;
+  box-shadow: 0 3px 6px rgba(7, 62, 58, 0.16), 0 3px 6px rgba(0,0,0,0.23) !important;
+}
+
+.Scaling-Increase-Button {
+  height: auto;
+  font-size: 4vh;
+  padding: 20px;
+  color: White;
+  border-radius: 0;
+  background-color: #0fbc49;
+  border: none;
+  float: right;
+  margin: 0;
+  cursor: pointer;
+}
+
+.Scaling-Decrease-Button {
+  height: auto;
+  font-size: 4vh;
+  padding: 20px;
+  color: White;
+  border-radius: 0;
+  background-color: #0fbc49;
+  border: none;
+  float: left;
+  margin: 0;
+  cursor: pointer;
+}
+
+.Scaling-Value {
+  position: relative;
+  top: 16px;
+}
+
+.Scaling-Change-Header {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: bold;
+  font-size: 2.5vh;
+  position: relative;
+  top: 20.5vh;
+  right: 36vw;
 }
