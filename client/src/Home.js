@@ -48,7 +48,6 @@ class Home extends Component {
 
     render() {
         const { portStatus } = this.props;
-        const { button1Text } = this.props;
         const { button2Text } = this.props;
         const { placeholderText } = this.props;
 
@@ -56,9 +55,9 @@ class Home extends Component {
             return (
                 <div className="Home-container">
                     <LogoHeader headerClass = {"Home-header"} />
-                    <LargeButton buttonText = { button1Text }
+                    {/*<LargeButton buttonText = { button1Text }
                                  clickEvent = { this.LoadPrinterStats }/>
-                    <br/>
+                    <br/>*/}
                     <LargeButton buttonText = { button2Text }
                                  clickEvent = { this.LoadSearchModels }/>
                     <PortStatus portStatus = { portStatus }/>

@@ -26,7 +26,7 @@
 .Home-header {
   width: 500px;
   overflow: hidden;
-  top: 13vh;
+  top: 19vh;
   position: relative;
   margin: auto;
 }
@@ -66,7 +66,7 @@
   box-shadow: 0px 7px #0ca540;
   border-radius: 3px;
   position: relative;
-  top: 10vh;
+  top: 13vh;
   font-size: 2.6vh;
   cursor: pointer;
 }

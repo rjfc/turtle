@@ -13,9 +13,8 @@ const express = require('express'),
       path = require("path"),
       shell = require("shelljs"),
       lineReader = require("line-reader"),
-      Nightmare = require('nightmare');
-
-const chokidar = require('chokidar');
+      Nightmare = require('nightmare'),
+      LineByLineReader = require('line-by-line');
 
 const nightmare = Nightmare({ show: true });
 
@@ -24,6 +23,7 @@ var modelDatabaseURL = "https://free3d.com/3d-models/";
 var modelPrintURL = "https://static.free3d.com/models/123d/printable_catalog/";
 const modelDownloadFolder = "/Users/Russell/Downloads/";
 var zipName = '';
+var dataGotten = true;
 
 var myPort = new serialport(portName,{
   baudRate: 250000,
@@ -51,11 +51,11 @@ var modelThumbnails = [];
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
+/*
 app.get('/port/status', (req, res) => {
   res.send({ express: portStatus });
 });
-
+*/
 /*
 app.post('/api/world', (req, res) => {
   console.log(req.body);
@@ -87,22 +87,22 @@ function onClose(error) {
 }
 
 function onData(data) {
-  var dataString = data.toString();
-  dataString = dataString.replace(/\s/g, "");
-  console.log("start data:" + dataString + "close\n");
+    dataGotten = true;
+    var dataString = data.toString();
+    dataString = dataString.replace(/\s/g, "");
+    console.log("start data:" + dataString + "close\n");
 
-  if (dataString.indexOf("Printtime:") >= 0) { //Print time
-    timeElapsed = dataString.substring(dataString.indexOf("Printtime:") + 10, dataString.length);
-  }
-  else if (dataString.indexOf("okT:") >= 0) { //Hotend temperature
-    hotendTemperature = dataString.substring(dataString.indexOf("okT:") + 4, dataString.indexOf("/0.00"));
-  }
-  else if (dataString.indexOf("CountX:") >= 0) { //X,Y,Z position
-    currentPosition.X = dataString.substring(dataString.indexOf("X:") + 2, dataString.indexOf("Y:"));
-    currentPosition.Y = dataString.substring(dataString.indexOf("Y:") + 2, dataString.indexOf("Z:"));
-    currentPosition.Z = dataString.substring(dataString.indexOf("Z:") + 2, dataString.indexOf("E:"));
-  }
-
+    if (dataString.indexOf("Printtime:") >= 0) { //Print time
+        timeElapsed = dataString.substring(dataString.indexOf("Printtime:") + 10, dataString.length);
+    }
+    else if (dataString.indexOf("T:") >= 0) { //Hotend temperature
+        hotendTemperature = dataString.substring(dataString.indexOf("T:") + 2, dataString.indexOf("/195.00"));
+    }
+    else if (dataString.indexOf("CountX:") >= 0) { //X,Y,Z position
+        currentPosition.X = dataString.substring(dataString.indexOf("X:") + 2, dataString.indexOf("Y:"));
+        currentPosition.Y = dataString.substring(dataString.indexOf("Y:") + 2, dataString.indexOf("Z:"));
+        currentPosition.Z = dataString.substring(dataString.indexOf("Z:") + 2, dataString.indexOf("E:"));
+    }
 }
 
 nightmare.on('download', function(state, downloadItem){
@@ -153,7 +153,7 @@ fs.watch(modelDownloadFolder, (eventType, filename) => {
         console.log(findModel(modelDownloadFolder, ".obj") + " | " + findModel(modelDownloadFolder, ".stl"));
       if (findModel(modelDownloadFolder, ".obj") && !findModel(modelDownloadFolder, ".stl")) {
           // can add scaling value to command
-          shell.exec("python obj2stl.py \"" + findModel(modelDownloadFolder, ".obj") + "\" ./temp/temp.stl");
+          shell.exec("python obj2stl.py \"" + findModel(modelDownloadFolder, ".obj") + "\" ./temp/temp.stl 4");
       }
       // If .stl found
       else{
@@ -183,39 +183,88 @@ io.on("connection", socket => {
             var path = "./temp/temp.gcode";
             var stats = fs.statSync(path);
             let seconds = +stats.mtime;
-            if(gcodeSentDone[filename] === seconds) return;
+            if (gcodeSentDone[filename] === seconds) return;
             gcodeSentDone[filename] = seconds;
             // open gcode file
-            setTimeout(function(){
-                io.sockets.emit("print status", "printing");
-                lineReader.eachLine('temp/temp.gcode', function(line, last) {
-                    //      console.log(line);
-                    // for each line in gcode, check if comment
-                    //if not comment and not empty/just whitespace
-                    var trimmedLine;
-                    if (line.includes(";")) {
-                        trimmedLine = line.substring(0, line.indexOf(";"));
-                    }
-                    else {
-                        trimmedLine = line;
-                    }
+            io.sockets.emit("print status", "printing");
+            //shell.exec("python streamGcode.py -p " + portName + " -f ./temp/temp.gcode");
+               setTimeout(function(){
+                 var lr = new LineByLineReader('temp/temp.gcode');
+                   lr.on('error', function (err) {
+                       // 'err' contains error object
+                   });
 
-                    if (trimmedLine && /\S/.test(trimmedLine) && trimmedLine !== '') {
-                        //strip leading and ending whitespace from line of gcode
-                        // append '\n' to line of gcode
-                        trimmedLine = trimmedLine.trim() + '\n';
-                        // write resulting line to port
-                        myPort.write(Buffer.from(trimmedLine),function(err,result){
-                            // print response
-                            console.log("Line: " + trimmedLine);
-                            console.log(result);
-                        });
-                    }
-                    if(last){
+                   lr.on('line', function (line) {
+                       // pause emitting of lines...
+                       lr.pause();
 
-                    }
-                });
-            }, 3000);
+                       // ...do your asynchronous line processing..
+                       setInterval(function () {
+                           if (dataGotten) {
+
+                               var trimmedLine;
+                               if (line.includes(";")) {
+                                   trimmedLine = line.substring(0, line.indexOf(";"));
+                               }
+                               else {
+                                   trimmedLine = line;
+                               }
+
+                               if (trimmedLine && /\S/.test(trimmedLine) && trimmedLine !== '') {
+                                   dataGotten = false;
+                                   //strip leading and ending whitespace from line of gcode
+                                   // append '\n' to line of gcode
+                                   trimmedLine = trimmedLine.trim() + '\n';
+                                   // Get printer stats
+                                   getPrinterStats();
+                                   // write resulting line to port
+                                   myPort.write(Buffer.from(trimmedLine),function(err,result){
+                                       // print response
+                                       console.log("Line: " + trimmedLine);
+                                       console.log(result);
+                                   });
+                               }
+                               clearInterval(this);
+                               // ...and continue emitting lines.
+                               lr.resume();
+                           }
+                       }, 100);
+                   });
+
+                   lr.on('end', function () {
+                       // All lines are read, file is closed now.
+                   });
+               }, 3000);
+            /*lineReader.eachLine('temp/temp.gcode', function(line, last) {
+                //      console.log(line);
+                // for each line in gcode, check if comment
+                //if not comment and not empty/just whitespace
+                var trimmedLine;
+                if (line.includes(";")) {
+                    trimmedLine = line.substring(0, line.indexOf(";"));
+                }
+                else {
+                    trimmedLine = line;
+                }
+
+                if (trimmedLine && /\S/.test(trimmedLine) && trimmedLine !== '') {
+                    //strip leading and ending whitespace from line of gcode
+                    // append '\n' to line of gcode
+                    trimmedLine = trimmedLine.trim() + '\n';
+                    // TODO: WAIT FOR RESPONSE
+                    // write resulting line to port
+                    myPort.write(Buffer.from(trimmedLine),function(err,result){
+                        // print response
+                        console.log("Line: " + trimmedLine);
+                        console.log(result);
+                    });
+                }
+                if(last){
+
+                }
+            });
+        }, 3000);
+    }*/
         }
     });
 
@@ -297,7 +346,7 @@ io.on("connection", socket => {
     })();
   });
 
-  socket.on("get printer stats", () =>{
+  function getPrinterStats() {
       if (portStatus === "Online") {
           // Time elapsed
           myPort.write(Buffer.from("M31\n"),function(err,result){
@@ -324,6 +373,10 @@ io.on("connection", socket => {
               io.sockets.emit("printer stats", printerStats);
           });
       }
+  }
+
+  socket.on("get printer stats", () =>{
+    getPrinterStats();
   });
 
   socket.on("get printer status", () => {
