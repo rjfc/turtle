@@ -5,7 +5,7 @@ import Home from './Home.js';
 class App extends Component {
     state = {
         response: 0,
-        endpoint: "http://10.36.53.98:5000/", //can change to http://127.0.0.1:5000  to run on local machine,
+        endpoint: "http://192.168.43.68:5000/", //can change to http://127.0.0.1:5000  to run on local machine,
         printerStatus: '',
         timeElapsedResponse: '',
         hotendTemperatureResponse: '',

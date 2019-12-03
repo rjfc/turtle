@@ -18,7 +18,7 @@ const express = require('express'),
 
 const nightmare = Nightmare({ show: true });
 
-var portName = "/dev/cu.usbmodem14101";
+var portName = "/dev/cu.usbmodem14201";
 var modelDatabaseURL = "https://free3d.com/3d-models/";
 var modelPrintURL = "https://static.free3d.com/models/123d/printable_catalog/";
 const modelDownloadFolder = "/Users/Russell/Downloads/";
@@ -52,18 +52,6 @@ var scalingFactor = 1;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-/*
-app.get('/port/status', (req, res) => {
-  res.send({ express: portStatus });
-});
-*/
-/*
-app.post('/api/world', (req, res) => {
-  console.log(req.body);
-  res.send(
-    `I received your POST request. This is what you sent me: ${req.body.post}`,
-  );
-});*/
 
 myPort.on("open", onOpen);
 parser.on("data", onData);
@@ -72,14 +60,6 @@ myPort.on('close', onClose);
 function onOpen() {
   console.log("Opened serial port");
   portStatus = "Online";
-  /* setTimeout(function() {
-     myPort.write(Buffer.from("M105\n"),function(err,result){
-       if(err){
-         console.log('ERR: ' + err);
-       }
-       console.log('result:' + result)
-     });
-   }, 1000);*/
 }
 
 function onClose(error) {
@@ -148,7 +128,7 @@ fs.watch(modelDownloadFolder, (eventType, filename) => {
       extractAndConvertDone[filename] = seconds;
     console.log("filename:" + filename);
     var dest = modelDownloadFolder + filename.replace(".zip", "");
-    // shell.exec
+
     extract(modelDownloadFolder + filename, {dir: dest}, function (err) {
       // If .obj file found but .stl is not
         console.log(findModel(modelDownloadFolder, ".obj") + " | " + findModel(modelDownloadFolder, ".stl"));
@@ -187,8 +167,7 @@ io.on("connection", socket => {
             if (gcodeSentDone[filename] === seconds) return;
             gcodeSentDone[filename] = seconds;
             // open gcode file
-            io.sockets.emit("print status", "printing");
-            //shell.exec("python streamGcode.py -p " + portName + " -f ./temp/temp.gcode");
+            io.sockets.emit("print status", "printing");;
                setTimeout(function(){
                  var lr = new LineByLineReader('temp/temp.gcode');
                    lr.on('error', function (err) {
@@ -236,36 +215,6 @@ io.on("connection", socket => {
                        // All lines are read, file is closed now.
                    });
                }, 3000);
-            /*lineReader.eachLine('temp/temp.gcode', function(line, last) {
-                //      console.log(line);
-                // for each line in gcode, check if comment
-                //if not comment and not empty/just whitespace
-                var trimmedLine;
-                if (line.includes(";")) {
-                    trimmedLine = line.substring(0, line.indexOf(";"));
-                }
-                else {
-                    trimmedLine = line;
-                }
-
-                if (trimmedLine && /\S/.test(trimmedLine) && trimmedLine !== '') {
-                    //strip leading and ending whitespace from line of gcode
-                    // append '\n' to line of gcode
-                    trimmedLine = trimmedLine.trim() + '\n';
-                    // TODO: WAIT FOR RESPONSE
-                    // write resulting line to port
-                    myPort.write(Buffer.from(trimmedLine),function(err,result){
-                        // print response
-                        console.log("Line: " + trimmedLine);
-                        console.log(result);
-                    });
-                }
-                if(last){
-
-                }
-            });
-        }, 3000);
-    }*/
         }
     });
 
@@ -283,7 +232,6 @@ io.on("connection", socket => {
                 var formatsText = $('.page-results-container > .search-results > .search-result > .search-result__content-wrapper > .search-result__info-wrapper > .search-result__format', html)[i].children[0].data;
                 if (formatsText.includes(".stl") || formatsText.includes(".obj")) {
                     qualifiedModels.push(i);
-
                 }
             }
           console.log(qualifiedModels.length);
