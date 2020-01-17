@@ -7,7 +7,7 @@ class PrinterStats extends Component {
         super(props);
         this.state = {
             response: 0,
-            endpoint: "http://192.168.43.68:5000/", //can change to http://127.0.0.1:5000  to run on local machine,
+            endpoint: "http://192.168.43.68:5000/", // Can change to http://127.0.0.1:5000  to run on local machine,
             printerStats: {
                 timeElapsed: '',
                 temperature: '',
@@ -22,9 +22,8 @@ class PrinterStats extends Component {
 
     componentDidMount() {
         const {endpoint} = this.state;
-        //Very simply connect to the socket
+        // Connect to the socket
         const socket = socketIOClient(endpoint);
-        //Listen for data on the "outgoing data" namespace and supply a callback for what to do when we get one. In this case, we set a state variable'
         setInterval(async () => {
             socket.emit("get printer stats");
         }, 1000);

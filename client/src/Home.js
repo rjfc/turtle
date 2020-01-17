@@ -25,7 +25,7 @@ class Home extends Component {
     }
     componentDidMount() {
         const {endpoint} = this.state;
-        //Very simply connect to the socket
+        // Connect to the socket
         const socket = socketIOClient(endpoint);
          setInterval(async () => {
              if (!this.state.searchModelsActive) {
@@ -68,9 +68,6 @@ class Home extends Component {
             return (
                 <div className="Home-container">
                     <LogoHeader headerClass = {"Home-header"} />
-                    {/*<LargeButton buttonText = { button1Text }
-                                 clickEvent = { this.LoadPrinterStats }/>
-                    <br/>*/}
                     <LargeButton buttonText = { button2Text }
                                  clickEvent = { this.LoadSearchModels }/>
                     <PortStatus portStatus = { portStatus }/>

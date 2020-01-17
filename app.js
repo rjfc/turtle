@@ -12,7 +12,6 @@ const express = require('express'),
       extract = require("extract-zip"),
       path = require("path"),
       shell = require("shelljs"),
-      lineReader = require("line-reader"),
       Nightmare = require('nightmare'),
       LineByLineReader = require('line-by-line');
 
@@ -250,7 +249,7 @@ io.on("connection", socket => {
           io.sockets.emit("search models thumbnails", modelsInfo);
         })
         .catch(function(err){
-          //handle error
+          // Handle error
         });
   });
 
@@ -278,7 +277,7 @@ io.on("connection", socket => {
           }
         })
         .catch(function(err){
-          //handle error
+          // Handle error
         });
     (async () => {
       const browser = await puppeteer.launch({
